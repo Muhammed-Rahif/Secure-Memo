@@ -1,19 +1,51 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+// import logo from './logo.svg';
+import "./App.css";
+
+import SignIn from "./Components/SignIn";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import SignUp from "./Components/SignUp";
+import ViewMemos from "./Components/ViewMemos";
+import TemporaryDrawer from "./Components/TemporaryDrawer";
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: [
+        {
+          name: "hi",
+        },
+      ],
+    };
+  }
+
+  createDataFile = () => {
+    
+  };
+
+  componentDidMount() {
+    this.createDataFile();
+  }
+
   render() {
     return (
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
-        </div>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
+      <Router>
+        <Switch>
+          <Route exact path="/">
+            <SignIn />
+          </Route>
+          <Route path="/signin">
+            <SignIn />
+          </Route>
+          <Route path="/signup">
+            <SignUp />
+          </Route>
+          <Route path="/my-memos">
+            <ViewMemos />
+          </Route>
+        </Switch>
+      </Router>
     );
   }
 }
