@@ -5,27 +5,15 @@ import "./App.css";
 import SignIn from "./Components/SignIn";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import SignUp from "./Components/SignUp";
-import ViewMemos from "./Components/ViewMemos";
-import TemporaryDrawer from "./Components/TemporaryDrawer";
+import HomeViewMemos from "./Components/HomeViewMemos";
+import MyProfile from "./Components/MyProfile";
+import AboutUs from "./Components/AboutUs";
+import ViewMemo from "./Components/ViewMemo";
+import EditMemo from "./Components/EditMemo";
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      data: [
-        {
-          name: "hi",
-        },
-      ],
-    };
-  }
-
-  createDataFile = () => {
-    
-  };
-
-  componentDidMount() {
-    this.createDataFile();
   }
 
   render() {
@@ -42,7 +30,19 @@ class App extends Component {
             <SignUp />
           </Route>
           <Route path="/my-memos">
-            <ViewMemos />
+            <HomeViewMemos />
+          </Route>
+          <Route path="/my-profile">
+            <MyProfile />
+          </Route>
+          <Route path="/about-us">
+            <AboutUs />
+          </Route>
+          <Route path="/view-memo/:id">
+            <ViewMemo />
+          </Route>
+          <Route path="/edit-memo/:id">
+            <EditMemo />
           </Route>
         </Switch>
       </Router>

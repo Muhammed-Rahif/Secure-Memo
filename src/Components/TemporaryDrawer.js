@@ -15,6 +15,8 @@ import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
 import LockIcon from "@material-ui/icons/Lock";
 import Avatar from "@material-ui/core/Avatar";
 import { deepOrange, deepPurple } from "@material-ui/core/colors";
+import InfoIcon from '@material-ui/icons/Info';
+import {useHistory} from 'react-router-dom';
 
 const useStyles = makeStyles({
   list: {
@@ -76,6 +78,7 @@ export default function TemporaryDrawer(props) {
     bottom: false,
     right: false,
   });
+  const history = useHistory();
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (
@@ -122,6 +125,13 @@ export default function TemporaryDrawer(props) {
           </ListItemIcon>
           <ListItemText primary="Secure Memos" />
         </ListItem>
+      <Divider/>
+        <ListItem onClick={()=>{history.push('/about-us')}} button key="Secure Memos">
+          <ListItemIcon>
+            <InfoIcon />
+          </ListItemIcon>
+          <ListItemText primary="About Us" />
+        </ListItem>
       </List>
     </div>
   );
@@ -135,7 +145,8 @@ export default function TemporaryDrawer(props) {
       {
         <React.Fragment key={anchor}>
           <Button
-            hidden={true}
+          style={{display:"none"}}
+            hidden
             id="openDrawer"
             onClick={toggleDrawer(anchor, true)}
           >

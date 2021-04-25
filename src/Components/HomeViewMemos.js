@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -18,6 +18,12 @@ import AddIcon from "@material-ui/icons/Add";
 import SearchIcon from "@material-ui/icons/Search";
 import MoreIcon from "@material-ui/icons/MoreVert";
 import TemporaryDrawer from "./TemporaryDrawer";
+import CreateMemo from "./CreateMemo";
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
+import Tooltip from "@material-ui/core/Tooltip";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 
 const messages = [
   {
@@ -80,6 +86,7 @@ const useStyles = makeStyles((theme) => ({
   },
   list: {
     marginBottom: theme.spacing(2),
+    minHeight:"80vh"
   },
   subheader: {
     backgroundColor: theme.palette.background.paper,
@@ -101,9 +108,47 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 export default function BottomAppBar() {
   const classes = useStyles();
   const [drawer, setDrawer] = useState(false);
+  const [createMemo, setCreateMemo] = useState(false);
+  const [snackBar, setSnackBar] = useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleSnackBarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setSnackBar(false);
+  };
+
+  const showSnackBar = (message, severity) => {
+    return (
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        open={snackBar}
+        autoHideDuration={6000}
+        onClose={handleSnackBarClose}
+      >
+        <Alert onClose={handleSnackBarClose} severity={severity}>
+          {message}
+        </Alert>
+      </Snackbar>
+    );
+  };
 
   return (
     <React.Fragment>
@@ -127,9 +172,11 @@ export default function BottomAppBar() {
               )}
               <ListItem button>
                 <ListItemAvatar>
-                  <Avatar alt="Profile Picture" src={person} />
+                  <Avatar alt="Profile Picture">
+                    {primary.charAt(0).toUpperCase()}
+                  </Avatar>
                 </ListItemAvatar>
-                <ListItemText primary={primary} secondary={secondary} />
+                <ListItemText onClick={()=>{ window.location.href="./view-memo/1234" }} primary={primary} secondary={secondary} />
               </ListItem>
             </React.Fragment>
           ))}
@@ -138,9 +185,9 @@ export default function BottomAppBar() {
       <AppBar position="fixed" color="primary" className={classes.appBar}>
         <Toolbar>
           <IconButton
-            onClick={()=>{
-                drawer ? setDrawer(false) : setDrawer(true)
-                document.getElementById("openDrawer").click();
+            onClick={() => {
+              drawer ? setDrawer(false) : setDrawer(true);
+              document.getElementById("openDrawer").click();
             }}
             edge="start"
             color="inherit"
@@ -148,19 +195,50 @@ export default function BottomAppBar() {
           >
             <MenuIcon />
           </IconButton>
-          <Fab color="secondary" aria-label="add" className={classes.fabButton}>
-            <AddIcon />
-          </Fab>
+          <Tooltip title="Create new Memo" arrow>
+            <Fab
+              id="addBtn"
+              color="secondary"
+              aria-label="add"
+              className={classes.fabButton}
+              onClick={() => {
+                createMemo
+                  ? setTimeout(() => {
+                      setCreateMemo(false);
+                    }, 500)
+                  : setCreateMemo(true);
+              }}
+            >
+              <AddIcon />
+            </Fab>
+          </Tooltip>
           <div className={classes.grow} />
+          <Tooltip title="Search" arrow>
           <IconButton color="inherit">
             <SearchIcon />
           </IconButton>
-          <IconButton edge="end" color="inherit">
+          </Tooltip>
+          <Tooltip title="Options" arrow>
+          <IconButton aria-controls="simple-menu" edge="end" color="inherit" aria-aria-haspopup="true" onClick={handleMenuClick}>
             <MoreIcon />
           </IconButton>
+          </Tooltip>
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+            <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
       <TemporaryDrawer anchor="left" active={drawer} />
+      {snackBar ? showSnackBar("Memo saved successsfully..!", "success") : null}
+      {createMemo ? <CreateMemo showSnackBar={setSnackBar} /> : null}
     </React.Fragment>
   );
 }
