@@ -14,6 +14,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 
 import { useForm } from "react-hook-form";
+import { FormatIndentIncreaseTwoTone } from "@material-ui/icons";
 
 function Copyright() {
   return (
@@ -48,61 +49,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignUp() {
+function signUpUser() {}
+
+export default function SignUp(props) {
   const classes = useStyles();
   const [fnValid, setFnValid] = useState(false);
   const [lnValid, setLnValid] = useState(false);
   const [emailValid, setEmailValid] = useState(false);
   const [passwordValid, setPasswordValid] = useState(false);
-  const { register, handleSubmit } = useForm({ reValidateMode: "onChange" });
-  const validateEmail = (email) => {
-    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
-  };
-  const onSubmit = (data) => {
-    console.log(validateEmail(data.email));
-    if (
-      data.firstName === null ||
-      data.firstName === "" ||
-      typeof data.firstName === "undefined"
-    ) {
-      setFnValid(true);
-    } else {
-      setFnValid(false);
-    }
-    if (
-      data.lastName === null ||
-      data.lastName === "" ||
-      typeof data.lastName === "undefined"
-    ) {
-      setLnValid(true);
-    } else {
-      setLnValid(false);
-    }
-    if (
-      data.email === null ||
-      data.email === "" ||
-      typeof data.email === "undefined"
-    ) {
-      setEmailValid(true);
-    } else {
-      if (validateEmail(data.email)) {
-        setEmailValid(false);
-      } else {
-        setEmailValid(true);
-      }
-    }
-    if (
-      data.password === null ||
-      data.password === "" ||
-      typeof data.password === "undefined"
-    ) {
-      setPasswordValid(true);
-    } else {
-      setPasswordValid(false);
-    }
-  };
+  var emailPattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ reValidateMode: "onChange" });
 
+  const onSubmit = (formData) => {
+    console.log(formData);
+    props.signUpUser(formData)
+  };
+  
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -124,9 +90,15 @@ export default function SignUp() {
                 label="First Name"
                 autoFocus
                 autoComplete="off"
-                {...register("firstName")}
-                error={fnValid ? true : false}
-                helperText="Type your first name."
+                {...register("firstName", { required: true, minLength: 3 })}
+                error={errors.firstName ? true : false}
+                helperText={
+                  errors.firstName
+                    ? errors.firstName.type === "required"
+                      ? "First name is required."
+                      : " Minimum lenght 3."
+                    : "Type your first name."
+                }
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -136,9 +108,15 @@ export default function SignUp() {
                 id="lastName"
                 label="Last Name"
                 autoComplete="off"
-                {...register("lastName")}
-                error={lnValid ? true : false}
-                helperText="Type your last name."
+                {...register("lastName", { required: true, minLength: 3 })}
+                error={errors.lastName ? true : false}
+                helperText={
+                  errors.lastName
+                    ? errors.lastName.type === "required"
+                      ? "Last name is required."
+                      : " Minimum lenght 3."
+                    : "Type your last name."
+                }
               />
             </Grid>
             <Grid item xs={12}>
@@ -148,11 +126,16 @@ export default function SignUp() {
                 id="email"
                 label="Email Address"
                 autoComplete="off"
-                {...register("email")}
-                error={emailValid ? true : false}
+                {...register("email", {
+                  required: true,
+                  pattern: emailPattern,
+                })}
+                error={errors.email ? true : false}
                 helperText={
-                  emailValid
-                    ? "Type a valid email address."
+                  errors.email
+                    ? errors.email.type === "required"
+                      ? "Email address is required."
+                      : "Type a valid email address."
                     : "Type your email address."
                 }
               />
@@ -165,12 +148,14 @@ export default function SignUp() {
                 type="password"
                 id="password"
                 autoComplete="off"
-                {...register("password")}
-                error={passwordValid ? true : false}
+                {...register("password", { required: true, minLength: 8 })}
+                error={errors.password ? true : false}
                 helperText={
-                  passwordValid
-                    ? "Type a strong password."
-                    : "Type a strong password."
+                  errors.password
+                    ? errors.password.type === "required"
+                      ? "Password is required."
+                      : "Minimum lenght is 8."
+                    : "Type your password."
                 }
               />
             </Grid>

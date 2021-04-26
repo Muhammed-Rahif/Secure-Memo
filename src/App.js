@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import "./App.css";
 
 import $ from "jquery";
+const CryptoJS = require("crypto-js");
 
 import SignIn from "./Components/SignIn";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
@@ -19,15 +20,36 @@ class App extends Component {
     this.state = {
       userData: {},
       memo: {},
+      encKey: "secure memo key",
     };
   }
 
-  signInUser = (userData) => {
-    alert("editUserMemo");
+  encryptObj = (obj) => {
+    let encObj = {};
+    Object.keys(obj).map((itm) => {
+      encObj[itm] = CryptoJS.AES.encrypt(obj[itm], this.state.encKey).toString();
+    });
+    console.log(encObj);
+    return encObj;
   };
 
   signUpUser = (userData) => {
-    alert("editUserMemo");
+    $.ajax({
+      method: "post",
+      url: "./signup-user",
+      data: this.encryptObj(userData),
+      success: (response) => {
+        if (response.status) {
+          window.location.href = "./";
+        } else {
+          alert("Not allowed!");
+        }
+      },
+    });
+  };
+
+  signInUser = (userId, userData) => {
+    alert("signInUser");
   };
 
   createUserMemo = (userId, memoData) => {
@@ -61,7 +83,7 @@ class App extends Component {
             <SignIn />
           </Route>
           <Route path="/signup">
-            <SignUp />
+            <SignUp signUpUser={this.signUpUser} />
           </Route>
           <Route path="/my-memos">
             <HomeViewMemos />
