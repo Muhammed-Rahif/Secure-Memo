@@ -86,7 +86,7 @@ const useStyles = makeStyles((theme) => ({
   },
   list: {
     marginBottom: theme.spacing(2),
-    minHeight:"80vh"
+    minHeight: "80vh",
   },
   subheader: {
     backgroundColor: theme.palette.background.paper,
@@ -112,7 +112,7 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-export default function BottomAppBar() {
+export default function BottomAppBar(props) {
   const classes = useStyles();
   const [drawer, setDrawer] = useState(false);
   const [createMemo, setCreateMemo] = useState(false);
@@ -176,7 +176,13 @@ export default function BottomAppBar() {
                     {primary.charAt(0).toUpperCase()}
                   </Avatar>
                 </ListItemAvatar>
-                <ListItemText onClick={()=>{ window.location.href="./view-memo/1234" }} primary={primary} secondary={secondary} />
+                <ListItemText
+                  onClick={() => {
+                    window.location.href = "./view-memo/1234";
+                  }}
+                  primary={primary}
+                  secondary={secondary}
+                />
               </ListItem>
             </React.Fragment>
           ))}
@@ -214,14 +220,20 @@ export default function BottomAppBar() {
           </Tooltip>
           <div className={classes.grow} />
           <Tooltip title="Search" arrow>
-          <IconButton color="inherit">
-            <SearchIcon />
-          </IconButton>
+            <IconButton color="inherit">
+              <SearchIcon />
+            </IconButton>
           </Tooltip>
           <Tooltip title="Options" arrow>
-          <IconButton aria-controls="simple-menu" edge="end" color="inherit" aria-aria-haspopup="true" onClick={handleMenuClick}>
-            <MoreIcon />
-          </IconButton>
+            <IconButton
+              aria-controls="simple-menu"
+              edge="end"
+              color="inherit"
+              aria-aria-haspopup="true"
+              onClick={handleMenuClick}
+            >
+              <MoreIcon />
+            </IconButton>
           </Tooltip>
           <Menu
             id="simple-menu"
@@ -232,7 +244,14 @@ export default function BottomAppBar() {
           >
             <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
             <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-            <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                props.logoutUser();
+              }}
+            >
+              Logout
+            </MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>

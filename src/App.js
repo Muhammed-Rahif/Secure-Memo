@@ -115,6 +115,12 @@ class App extends Component {
     });
   };
 
+  logoutUser = () =>{
+    this.setState({ userLoggedIn:false,userData:null });
+    window.localStorage.setItem(clientStorageKey,"null");
+    window.location.reload();
+  }
+
   createUserMemo = (userId, memoData) => {
     alert("createUserMemo");
   };
@@ -191,7 +197,7 @@ class App extends Component {
         <Switch>
           <Route exact path="/" component={SignIn}>
             {this.state.userLoggedIn ? (
-              <HomeViewMemos />
+              <HomeViewMemos logoutUser={this.logoutUser} />
             ) : (
               <Redirect push to="./signup" />
             )}
@@ -211,7 +217,7 @@ class App extends Component {
             )}
           </Route>
           <Route path="/my-memos">
-            <HomeViewMemos />
+            <HomeViewMemos logoutUser={this.logoutUser} />
           </Route>
           <Route path="/my-profile">
             <MyProfile />
