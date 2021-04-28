@@ -6,6 +6,16 @@ const encKey = "secure memo key";
 const { v4: uuidv4 } = require("uuid");
 const { ObjectId } = require("bson");
 
+decryptToOrgStr = (str) => {
+  return new Promise((resolve, reject) => {
+    let decStr = "";
+    decStr = CryptoJS.AES.decrypt(str, encKey).toString(CryptoJS.enc.Utf8);
+    decStr = decStr.replace(/['"]+/g, "");
+    console.log(decStr);
+    resolve(decStr);
+  });
+};
+
 decryptToOrgObj = (obj) => {
   return new Promise((resolve, reject) => {
     let decObj = {};
@@ -31,10 +41,11 @@ encryptObj = (obj) => {
 };
 
 module.exports = {
-  signUpUser:(userData) => {
-    var encUserData = userData;
+  signUpUser: (userData) => {
     return new Promise((resolve, reject) => {
-      decryptToOrgObj(userData).then(async(userData) => {
+      decryptToOrgStr(userData.password).then(async (password) => {
+        userData.password = password;
+        userData.email = await decryptToOrgStr(userData.email);
         userData.password = await bcrypt.hash(userData.password, 10);
         userData.userId = uuidv4();
         db.get()
@@ -52,7 +63,7 @@ module.exports = {
                     status: true,
                     userData: {
                       userId: userData.userId,
-                      userEmail: encUserData.email,
+                      userEmail: userData.email,
                     },
                   });
                 });
@@ -62,33 +73,34 @@ module.exports = {
     });
   },
   signInUser: (userData) => {
-    var encUserData = userData;
-    return new Promise((resolve, reject) => {
-      decryptToOrgObj(userData).then((userData) => {
-        db.get()
-          .collection(collections.USERS_COLLECTION)
-          .findOne({ email: userData.email })
-          .then(async (userExist) => {
-            if (userExist) {
-              console.log(
-                await bcrypt.compare(userExist.password, userData.password)
-              );
-              if (await bcrypt.compare(userData.password, userExist.password)) {
-                resolve({
-                  status: true,
-                  userData: {
-                    userId: userExist.userId,
-                    userEmail: encUserData.email,
-                  },
-                });
-              } else {
-                resolve({ status: false, errorMsg: "Incorrect password!" });
-              }
+    return new Promise(async (resolve, reject) => {
+      userData = await decryptToOrgObj(userData);
+      db.get()
+        .collection(collections.USERS_COLLECTION)
+        .findOne({ email: userData.email })
+        .then(async (userExist) => {
+          console.log(userExist);
+          if (userExist) {
+            console.log(userExist.password);
+            console.log(userData.password);
+            console.log(
+              await bcrypt.compare(userData.password, userExist.password)
+            );
+            if (await bcrypt.compare(userData.password, userExist.password)) {
+              resolve({
+                status: true,
+                userData: {
+                  userId: userExist.userId,
+                  userEmail: userData.email,
+                },
+              });
             } else {
-              resolve({ status: false, errorMsg: "User not found!" });
+              resolve({ status: false, errorMsg: "Incorrect password!" });
             }
-          });
-      });
+          } else {
+            resolve({ status: false, errorMsg: "User not found!" });
+          }
+        });
     });
   },
   getUserData: (userId) => {
