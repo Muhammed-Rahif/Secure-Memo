@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useEffect } from "react";
 // import logo from './logo.svg';
 import "./App.css";
 
@@ -13,24 +13,50 @@ import MyProfile from "./Components/MyProfile";
 import AboutUs from "./Components/AboutUs";
 import ViewMemo from "./Components/ViewMemo";
 import EditMemo from "./Components/EditMemo";
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
+import { Redirect } from "react-router";
+const clientStorageKey = "SecureMemoStorage";
+const encKey = "secure memo key";
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userData: {},
-      memo: {},
-      encKey: "secure memo key",
+      userData: null,
+      userLoggedIn: false,
+      myMemos: [],
+      snackbar: {
+        openSnackbar: false,
+        msg: "",
+        type: "success",
+        position: { vertical: "left", horizontal: "bottom" },
+      },
     };
   }
 
   encryptObj = (obj) => {
     let encObj = {};
     Object.keys(obj).map((itm) => {
-      encObj[itm] = CryptoJS.AES.encrypt(obj[itm], this.state.encKey).toString();
+      encObj[itm] = CryptoJS.AES.encrypt(obj[itm], encKey).toString();
     });
-    console.log(encObj);
     return encObj;
+  };
+
+  decryptToOrgObj = (obj) => {
+    let decObj = {};
+    Object.keys(obj).map((itm) => {
+      console.log(obj[itm]);
+      decObj[itm] = CryptoJS.AES.decrypt(obj[itm], encKey).toString(
+        CryptoJS.enc.Utf8
+      );
+      decObj[itm] = decObj[itm].replace(/['"]+/g, "");
+    });
+    return decObj;
   };
 
   signUpUser = (userData) => {
@@ -40,16 +66,53 @@ class App extends Component {
       data: this.encryptObj(userData),
       success: (response) => {
         if (response.status) {
-          window.location.href = "./";
+          this.setState({ userData: response.userData });
+          this.setState({ userLoggedIn: true });
+          this.verifyUserLogin();
+          <Redirect push to="./" />;
         } else {
-          alert("Not allowed!");
+          this.setState({
+            snackbar: {
+              openSnackbar: true,
+              msg: `Can't sign up : ${response.errorMsg}`,
+              type: "error",
+              position: {
+                vertical: "center",
+                horizontal: "top",
+              },
+            },
+          });
         }
       },
     });
   };
 
-  signInUser = (userId, userData) => {
-    alert("signInUser");
+  signInUser = (userData) => {
+    $.ajax({
+      method: "post",
+      url: "./signin-user",
+      data: this.encryptObj(userData),
+      success: (response) => {
+        if (response.status) {
+          this.setState({ userData: response.userData });
+          this.setState({ userLoggedIn: true });
+          this.verifyUserLogin();
+          <Redirect push to="./" />;
+        } else {
+          this.setState({
+            snackbar: {
+              openSnackbar: true,
+              msg: `Can't sign in : ${response.errorMsg}`,
+              type: "error",
+              position: {
+                vertical: "center",
+                horizontal: "top",
+              },
+            },
+          });
+        }
+      },
+    });
   };
 
   createUserMemo = (userId, memoData) => {
@@ -72,18 +135,80 @@ class App extends Component {
     alert("editUserMemo");
   };
 
+  handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    this.setState({ snackbar: { openSnackbar: false } });
+  };
+
+  verifyUserLogin = () => {
+    let userData = this.state.userData;
+    let userLocalStorage = JSON.parse(
+      window.localStorage.getItem(clientStorageKey)
+    );
+    console.log(userData);
+    if (userLocalStorage) {
+      console.log(userData);
+      this.setState({
+        userData: userLocalStorage,
+        userLoggedIn: true,
+      });
+      console.log("seting state");
+    } else {
+      window.localStorage.setItem(clientStorageKey, JSON.stringify(userData));
+    }
+    console.log(this.state.userData);
+  };
+
+  componentDidMount = () => {
+    this.verifyUserLogin();
+  };
+
   render() {
+    console.log(JSON.parse(window.localStorage.getItem(clientStorageKey)));
+    console.log(this.state.userLoggedIn);
+
     return (
       <Router>
+        {/* Alert a snackbar */}
+        {this.state.snackbar.openSnackbar ? (
+          <Snackbar
+            open={this.state.snackbar.openSnackbar}
+            autoHideDuration={6000}
+            onClose={this.handleSnackbarClose}
+            anchorOrigin={this.state.snackbar.position}
+          >
+            <Alert
+              onClose={this.handleSnackbarClose}
+              severity={this.state.snackbar.type}
+            >
+              {this.state.snackbar.msg}
+            </Alert>
+          </Snackbar>
+        ) : null}
         <Switch>
           <Route exact path="/" component={SignIn}>
-            <SignIn />
+            {this.state.userLoggedIn ? (
+              <HomeViewMemos />
+            ) : (
+              <Redirect push to="./signup" />
+            )}
           </Route>
           <Route path="/signin">
-            <SignIn />
+            {this.state.userLoggedIn ? (
+              <Redirect push to="./" />
+            ) : (
+              <SignIn signInUser={this.signInUser} />
+            )}
           </Route>
           <Route path="/signup">
-            <SignUp signUpUser={this.signUpUser} />
+            {this.state.userLoggedIn ? (
+              <Redirect push to="./" />
+            ) : (
+              <SignUp signUpUser={this.signUpUser} />
+            )}
           </Route>
           <Route path="/my-memos">
             <HomeViewMemos />

@@ -49,14 +49,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function signUpUser() {}
 
 export default function SignUp(props) {
   const classes = useStyles();
-  const [fnValid, setFnValid] = useState(false);
-  const [lnValid, setLnValid] = useState(false);
-  const [emailValid, setEmailValid] = useState(false);
-  const [passwordValid, setPasswordValid] = useState(false);
   var emailPattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   const {
     register,
@@ -65,7 +60,6 @@ export default function SignUp(props) {
   } = useForm({ reValidateMode: "onChange" });
 
   const onSubmit = (formData) => {
-    console.log(formData);
     props.signUpUser(formData)
   };
   

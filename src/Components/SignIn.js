@@ -55,42 +55,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignIn() {
+export default function SignIn(props) {
   const classes = useStyles();
-  const [emailValid, setEmailValid] = useState(false);
-  const [passwordValid, setPasswordValid] = useState(false);
-  const { register, handleSubmit } = useForm({ reValidateMode: "onChange" });
-  const validateEmail = (email) => {
-    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
+  var emailPattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ reValidateMode: "onChange" });
+  const onSubmit = (formData) => {
+    props.signInUser(formData);
   };
-  const onSubmit = (data) => {
-    console.log(validateEmail(data.email));
-    if (
-      data.email === null ||
-      data.email === "" ||
-      typeof data.email === "undefined"
-    ) {
-      setEmailValid(true);
-    } else {
-      if (validateEmail(data.email)) {
-        setEmailValid(false);
-      } else {
-        setEmailValid(true);
-      }
-    }
-    if (
-      data.password === null ||
-      data.password === "" ||
-      typeof data.password === "undefined"
-    ) {
-      setPasswordValid(true);
-    } else {
-      setPasswordValid(false);
-    }
-    window.location.href="./my-memos"
-  };
-
+  
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -110,11 +86,16 @@ export default function SignIn() {
             label="Email Address"
             autoComplete="off"
             autoFocus
-            {...register("email")}
-            error={emailValid ? true : false}
+            {...register("email", {
+              required: true,
+              pattern: emailPattern,
+            })}
+            error={errors.email ? true : false}
             helperText={
-              emailValid
-                ? "Type a valid email address."
+              errors.email
+                ? errors.email.type === "required"
+                  ? "Email address is required."
+                  : "Type a valid email address."
                 : "Type your email address."
             }
           />
@@ -126,10 +107,14 @@ export default function SignIn() {
             type="password"
             id="password"
             autoComplete="off"
-            {...register("password")}
-            error={passwordValid ? true : false}
+            {...register("password", { required: true, minLength: 8 })}
+            error={errors.password ? true : false}
             helperText={
-              passwordValid ? "Type correct password." : "Type your password."
+              errors.password
+                ? errors.password.type === "required"
+                  ? "Password is required."
+                  : "Minimum lenght is 8."
+                : "Type your password."
             }
           />
           {/* <FormControlLabel
