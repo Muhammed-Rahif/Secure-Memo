@@ -235,7 +235,7 @@ class App extends Component {
         <Switch>
           <Route exact path="/" component={SignIn}>
             {this.state.userLoggedIn ? (
-              <HomeViewMemos logoutUser={this.logoutUser} />
+              <HomeViewMemos createUserMemo={this.createUserMemo} logoutUser={this.logoutUser} />
             ) : (
               <Redirect push to="./signup" />
             )}

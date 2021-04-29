@@ -26,6 +26,7 @@ import SaveIcon from "@material-ui/icons/Save";
 import Paper from "@material-ui/core/Paper";
 import ReactMarkdown from "react-markdown";
 import Switch from "@material-ui/core/Switch";
+import $ from "jquery";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -48,18 +49,18 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function FullScreenDialog(props) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
-  const [addMemoTo, setAddMemoTo] = React.useState("allMemos");
   const [textAreaHeight, setTextAreaHeight] = React.useState(null);
   const [mdScrollable, setMdScrollable] = React.useState(false);
-  const [memoHeading, setMemoHeading] = React.useState(null);
-  const [textAreaContent, setTextAreaContent] = React.useState(null);
+  const [textAreaContent, setTextAreaContent] = React.useState("");
   const {
     register,
+    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm({ reValidateMode: "onChange" });
 
   const onSubmit = (formData) => {
+    console.log(formData);
     props.createUserMemo(formData);
     handleClose();
     props.showSnackBar(true);
@@ -92,12 +93,9 @@ export default function FullScreenDialog(props) {
     setOpen(false);
   };
 
-  const handleSelectChange = (event) => {
-    setAddMemoTo(event.target.value);
-  };
-
-  const updateMarkdown = () => {
-    setTextAreaContent(document.getElementById("bodyTextarea").value);
+  const updateMarkdown = (e) => {
+    setTextAreaContent($("#bodyTextarea").val());
+    setTextAreaContent(e.target.value);
   };
 
   const switchHandler = (event) => {
@@ -105,6 +103,8 @@ export default function FullScreenDialog(props) {
     changePreviewScrollable(event);
   };
 
+  console.log(errors);
+  console.log(textAreaContent);
   return (
     <div>
       <Dialog
@@ -156,17 +156,18 @@ export default function FullScreenDialog(props) {
                 label="Memo Heading"
                 variant="outlined"
                 fullWidth
-                value={memoHeading}
-                onChange={() => {
-                  setMemoHeading(event.target.value);
-                }}
-                {...register("memoTitle", { required: true, minLength: 8 })}
+                ref={register("memoTitle", { required: true, minLength: 10 })}
                 error={errors.memoTitle ? true : false}
+                onChange={(e)=>{
+                  setValue("memoTitle", e.target.value, {
+                    shouldValidate: true,
+                  });
+                }}
                 helperText={
                   errors.memoTitle
                     ? errors.memoTitle.type === "required"
-                      ? "Title is required."
-                      : "Minimum lenght 8."
+                      ? "Memo Title is required."
+                      : "Memo Title minimum lenght is 10."
                     : "Memo Title here."
                 }
               />
@@ -185,17 +186,25 @@ export default function FullScreenDialog(props) {
                 variant="outlined"
                 rows="7"
                 multiline={true}
+                value={textAreaContent}
                 fullWidth
                 aria-label="textarea"
-                value={textAreaContent}
-                onChange={updateMarkdown}
-                {...register("memoBody", { required: true, minLength: 12 })}
+                onChange={(e) => {
+                  updateMarkdown(e);
+                  setValue("memoBody", e.target.value, {
+                    shouldValidate: true,
+                  });
+                }}
+                ref={register("memoBody", {
+                  required: true,
+                  minLength: 12,
+                })}
                 error={errors.memoBody ? true : false}
                 helperText={
                   errors.memoBody
                     ? errors.memoBody.type === "required"
-                      ? "Title is required."
-                      : "Minimum lenght 12."
+                      ? "Memo body is required."
+                      : "Memo body Minimum lenght is 12."
                     : "Memo Body here."
                 }
               />
@@ -241,13 +250,17 @@ export default function FullScreenDialog(props) {
                   Add to
                 </InputLabel>
                 <Select
+                  defaultValue="allMemos"
                   labelId="demo-simple-select-outlined-label"
                   id="demo-simple-select-outlined"
-                  value={addMemoTo}
-                  onChange={handleSelectChange}
                   label="Add to"
-                  {...register("memoTitle", { required: true})}
-                  error={errors.memoTitle ? true : false}
+                  onChange={(e) => {
+                    setValue("memoType", e.target.value, {
+                      shouldValidate: true,
+                    });
+                  }}
+                  {...register("memoType", { required: true })}
+                  error={errors.memoType ? true : false}
                   helperText="Memo will add to all memos section by default."
                 >
                   <MenuItem value="allMemos">

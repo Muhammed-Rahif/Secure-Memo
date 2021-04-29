@@ -257,7 +257,7 @@ export default function BottomAppBar(props) {
       </AppBar>
       <TemporaryDrawer anchor="left" active={drawer} />
       {snackBar ? showSnackBar("Memo saved successsfully..!", "success") : null}
-      {createMemo ? <CreateMemo showSnackBar={setSnackBar} /> : null}
+      {createMemo ? <CreateMemo createUserMemo={props.createUserMemo} showSnackBar={setSnackBar} /> : null}
     </React.Fragment>
   );
 }

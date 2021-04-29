@@ -116,4 +116,20 @@ module.exports = {
         });
     });
   },
+  createUserMemo: (data) => {
+    // return new Promise((resolve, reject) => {
+    //     data.memoDate = new Date();
+    //     data.memoId = uuidv4();
+    //     var tempObj = {
+    //       userId : data.userId,
+    //       userMemos:{
+    //         allMemos :[],
+    //         hiddenMemos : [],
+    //         secureMemos : []
+    //       }
+    //     }
+    //     tempObj.userMemos[data.memoType].push(data);
+    //     db.collection(collections)
+    // });
+  },
 };
