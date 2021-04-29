@@ -246,6 +246,9 @@ export default function FullScreenDialog(props) {
                   value={addMemoTo}
                   onChange={handleSelectChange}
                   label="Add to"
+                  {...register("memoTitle", { required: true})}
+                  error={errors.memoTitle ? true : false}
+                  helperText="Memo will add to all memos section by default."
                 >
                   <MenuItem value="allMemos">
                     <AllInboxIcon /> All Memos

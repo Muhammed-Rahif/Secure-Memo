@@ -213,7 +213,6 @@ class App extends Component {
         <Backdrop
           style={{zIndex:999999}}
           open={this.state.backdropOpen}
-          onClick={this.BackdropClose}
         >
           <CircularProgress color="inherit" />
         </Backdrop>
