@@ -6,21 +6,19 @@ const encKey = "secure memo key";
 const { v4: uuidv4 } = require("uuid");
 const { ObjectId } = require("bson");
 
-decryptToOrgStr = (str) => {
+var decryptToOrgStr = (str) => {
   return new Promise((resolve, reject) => {
     let decStr = "";
     decStr = CryptoJS.AES.decrypt(str, encKey).toString(CryptoJS.enc.Utf8);
     decStr = decStr.replace(/['"]+/g, "");
-    console.log(decStr);
     resolve(decStr);
   });
 };
 
-decryptToOrgObj = (obj) => {
+var decryptToOrgObj = (obj) => {
   return new Promise((resolve, reject) => {
     let decObj = {};
     Object.keys(obj).map((itm) => {
-      console.log(obj[itm]);
       decObj[itm] = CryptoJS.AES.decrypt(obj[itm], encKey).toString(
         CryptoJS.enc.Utf8
       );
@@ -30,7 +28,7 @@ decryptToOrgObj = (obj) => {
   });
 };
 
-encryptObj = (obj) => {
+var encryptObj = (obj) => {
   return new Promise((resolve, reject) => {
     let encObj = {};
     Object.keys(obj).map((itm) => {
@@ -40,12 +38,17 @@ encryptObj = (obj) => {
   });
 };
 
+var encUnSaltStr = (str) => {
+  return CryptoJS.AES.encrypt(str, CryptoJS.enc.Utf8.parse(encKey), {
+    iv: { words: [0, 0, 0, 0], sigBytes: 16 },
+  }).toString();
+};
+
 module.exports = {
   signUpUser: (userData) => {
     return new Promise((resolve, reject) => {
       decryptToOrgStr(userData.password).then(async (password) => {
         userData.password = password;
-        userData.email = await decryptToOrgStr(userData.email);
         userData.password = await bcrypt.hash(userData.password, 10);
         userData.userId = uuidv4();
         db.get()
@@ -74,18 +77,18 @@ module.exports = {
   },
   signInUser: (userData) => {
     return new Promise(async (resolve, reject) => {
+      console.log(userData.email);
+      let userEmail = userData.email;
+      delete userData.email;
       userData = await decryptToOrgObj(userData);
+      userData.email = userEmail;
+      console.log(userData.email);
       db.get()
         .collection(collections.USERS_COLLECTION)
         .findOne({ email: userData.email })
         .then(async (userExist) => {
           console.log(userExist);
           if (userExist) {
-            console.log(userExist.password);
-            console.log(userData.password);
-            console.log(
-              await bcrypt.compare(userData.password, userExist.password)
-            );
             if (await bcrypt.compare(userData.password, userExist.password)) {
               resolve({
                 status: true,

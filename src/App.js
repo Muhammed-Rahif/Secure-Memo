@@ -47,6 +47,12 @@ class App extends Component {
     return encObj;
   };
 
+  encUnSaltStr = (str) => {
+    return CryptoJS.AES.encrypt(str, CryptoJS.enc.Utf8.parse(encKey), {
+      iv: { words: [0, 0, 0, 0], sigBytes: 16 },
+    }).toString();
+  };
+
   decryptToOrgObj = (obj) => {
     let decObj = {};
     Object.keys(obj).map((itm) => {
@@ -60,10 +66,14 @@ class App extends Component {
   };
 
   signUpUser = (userData) => {
+    var userEmail = userData.email;
+    delete userData.email;
+    userData = this.encryptObj(userData);
+    userData.email = this.encUnSaltStr(userEmail);
     $.ajax({
       method: "post",
       url: "./signup-user",
-      data: this.encryptObj(userData),
+      data: userData,
       success: (response) => {
         if (response.status) {
           this.setState({ userData: response.userData });
@@ -88,10 +98,15 @@ class App extends Component {
   };
 
   signInUser = (userData) => {
+    var userEmail = userData.email;
+    delete userData.email;
+    userData = this.encryptObj(userData);
+    userData.email = this.encUnSaltStr(userEmail);
+    console.log(userData);
     $.ajax({
       method: "post",
       url: "./signin-user",
-      data: this.encryptObj(userData),
+      data: userData,
       success: (response) => {
         if (response.status) {
           this.setState({ userData: response.userData });
@@ -115,11 +130,11 @@ class App extends Component {
     });
   };
 
-  logoutUser = () =>{
-    this.setState({ userLoggedIn:false,userData:null });
-    window.localStorage.setItem(clientStorageKey,"null");
+  logoutUser = () => {
+    this.setState({ userLoggedIn: false, userData: null });
+    window.localStorage.setItem(clientStorageKey, "null");
     window.location.reload();
-  }
+  };
 
   createUserMemo = (userId, memoData) => {
     alert("createUserMemo");
