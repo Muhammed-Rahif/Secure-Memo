@@ -16,6 +16,8 @@ import EditMemo from "./Components/EditMemo";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import { Redirect } from "react-router";
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
 const clientStorageKey = "SecureMemoStorage";
 const encKey = "secure memo key";
 
@@ -36,8 +38,16 @@ class App extends Component {
         type: "success",
         position: { vertical: "left", horizontal: "bottom" },
       },
+      backdropOpen: false,
     };
   }
+
+  BackdropClose = () => {
+    this.setState({ backdropOpen: false });
+  };
+  backdropToggle = () => {
+    this.setState({ backdropOpen: !this.state.backdropOpen });
+  };
 
   encryptObj = (obj) => {
     let encObj = {};
@@ -66,6 +76,7 @@ class App extends Component {
   };
 
   signUpUser = (userData) => {
+    this.backdropToggle();
     var userEmail = userData.email;
     delete userData.email;
     userData = this.encryptObj(userData);
@@ -76,11 +87,13 @@ class App extends Component {
       data: userData,
       success: (response) => {
         if (response.status) {
+          this.backdropToggle();
           this.setState({ userData: response.userData });
           this.setState({ userLoggedIn: true });
           this.verifyUserLogin();
           <Redirect push to="./" />;
         } else {
+          this.backdropToggle();
           this.setState({
             snackbar: {
               openSnackbar: true,
@@ -98,6 +111,7 @@ class App extends Component {
   };
 
   signInUser = (userData) => {
+    this.backdropToggle();
     var userEmail = userData.email;
     delete userData.email;
     userData = this.encryptObj(userData);
@@ -109,11 +123,13 @@ class App extends Component {
       data: userData,
       success: (response) => {
         if (response.status) {
+          this.backdropToggle();
           this.setState({ userData: response.userData });
           this.setState({ userLoggedIn: true });
           this.verifyUserLogin();
           <Redirect push to="./" />;
         } else {
+          this.backdropToggle();
           this.setState({
             snackbar: {
               openSnackbar: true,
@@ -156,7 +172,7 @@ class App extends Component {
     alert("editUserMemo");
   };
 
-  handleSnackbarClose = (event, reason) => {
+  SnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
@@ -193,16 +209,24 @@ class App extends Component {
 
     return (
       <Router>
+        {/* Backdrop */}
+        <Backdrop
+          style={{zIndex:999999}}
+          open={this.state.backdropOpen}
+          onClick={this.BackdropClose}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
         {/* Alert a snackbar */}
         {this.state.snackbar.openSnackbar ? (
           <Snackbar
             open={this.state.snackbar.openSnackbar}
             autoHideDuration={6000}
-            onClose={this.handleSnackbarClose}
+            onClose={this.SnackbarClose}
             anchorOrigin={this.state.snackbar.position}
           >
             <Alert
-              onClose={this.handleSnackbarClose}
+              onClose={this.SnackbarClose}
               severity={this.state.snackbar.type}
             >
               {this.state.snackbar.msg}
