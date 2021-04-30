@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const encKey = "secure memo key";
 const { v4: uuidv4 } = require("uuid");
 const { ObjectId } = require("bson");
+const { response } = require("express");
 
 var decryptToOrgStr = (str) => {
   return new Promise((resolve, reject) => {
@@ -117,7 +118,7 @@ module.exports = {
     });
   },
   createUserMemo: (memoData) => {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       var userId = memoData.userId;
       var memoType = await decryptToOrgStr(memoData.memoType);
       var userEmail = memoData.userEmail;
@@ -131,7 +132,7 @@ module.exports = {
         .findOne({ userId: userId })
         .then((userMemosExist) => {
           if (userMemosExist) {
-            var memoArray = "userMemos."+memoType;
+            var memoArray = "userMemos." + memoType;
             db.get()
               .collection(collections.MEMOS_COLLECTION)
               .updateOne(
@@ -139,9 +140,10 @@ module.exports = {
                 {
                   $push: { [memoArray]: memoData },
                 }
-              ).then(()=>{
+              )
+              .then(() => {
                 resolve({ status: true, firstMemo: false });
-              })
+              });
           } else {
             var tempObj = {
               userId: userId,
@@ -152,12 +154,25 @@ module.exports = {
               },
             };
             tempObj.userMemos[memoType].push(memoData);
-            db.get().collection(collections.MEMOS_COLLECTION)
+            db.get()
+              .collection(collections.MEMOS_COLLECTION)
               .insertOne(tempObj)
               .then(() => {
                 resolve({ status: true, firstMemo: true });
               });
           }
+        });
+    });
+  },
+  getUserMemos: (memoData) => {
+    return new Promise((resolve, reject) => {
+      var userId = memoData.userId;
+      var memoType = memoData.memoType;
+      db.get()
+        .collection(collections.MEMOS_COLLECTION)
+        .findOne({ userId: userId })
+        .then((userMemoData) => {
+          resolve(userMemoData.userMemos[memoType]);
         });
     });
   },

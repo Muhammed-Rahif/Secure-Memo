@@ -67,6 +67,12 @@ app.post("/create-user-memo", (req, res) => {
   });
 });
 
+app.post("/get-user-memos", (req, res) => {
+  userFunctions.getUserMemos(req.body).then((memosArray)=>{
+    res.json(memosArray);
+  })
+});
+
 // Redirect to react app
 
 app.get("/", (req, res) => {

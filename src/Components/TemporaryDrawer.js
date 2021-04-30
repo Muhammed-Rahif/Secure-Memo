@@ -15,8 +15,8 @@ import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
 import LockIcon from "@material-ui/icons/Lock";
 import Avatar from "@material-ui/core/Avatar";
 import { deepOrange, deepPurple } from "@material-ui/core/colors";
-import InfoIcon from '@material-ui/icons/Info';
-import {useHistory} from 'react-router-dom';
+import InfoIcon from "@material-ui/icons/Info";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles({
   list: {
@@ -34,13 +34,16 @@ const useStyles = makeStyles({
     padding: "0 !important",
   },
   bgImage: {
-    backgroundImage: "url('https://picsum.photos/300/200')",
+    backgroundImage: "url('../profile-bg.jpg')",
     filter: "opacity(75%)",
     height: "100%",
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
     display: "flex",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "cover",
   },
 });
 
@@ -102,7 +105,11 @@ export default function TemporaryDrawer(props) {
     >
       <List className={classes.profileSection}>
         <div className={classes.bgImage}>
-          <Avatar className={[profileIconClasses.orange,profileIconClasses.large]}>OP</Avatar>
+          <Avatar
+            className={[profileIconClasses.orange, profileIconClasses.large]}
+          >
+            OP
+          </Avatar>
         </div>
       </List>
       <Divider />
@@ -125,8 +132,14 @@ export default function TemporaryDrawer(props) {
           </ListItemIcon>
           <ListItemText primary="Secure Memos" />
         </ListItem>
-      <Divider/>
-        <ListItem onClick={()=>{history.push('/about-us')}} button key="Secure Memos">
+        <Divider />
+        <ListItem
+          onClick={() => {
+            history.push("/about-us");
+          }}
+          button
+          key="Secure Memos"
+        >
           <ListItemIcon>
             <InfoIcon />
           </ListItemIcon>
@@ -145,7 +158,7 @@ export default function TemporaryDrawer(props) {
       {
         <React.Fragment key={anchor}>
           <Button
-          style={{display:"none"}}
+            style={{ display: "none" }}
             hidden
             id="openDrawer"
             onClick={toggleDrawer(anchor, true)}

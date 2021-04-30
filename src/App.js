@@ -172,7 +172,9 @@ class App extends Component {
           this.setState({
             snackbar: {
               openSnackbar: true,
-              msg: response.firstMemo ? "Successfully saved your first memo.!":"Successfully saved your memo.!",
+              msg: response.firstMemo
+                ? "Successfully saved your first memo.!"
+                : "Successfully saved your memo.!",
               type: "success",
               position: {
                 vertical: "left",
@@ -233,7 +235,6 @@ class App extends Component {
         userData: userLocalStorage,
         userLoggedIn: true,
       });
-      console.log("seting state");
     } else {
       window.localStorage.setItem(clientStorageKey, JSON.stringify(userData));
     }
@@ -259,6 +260,7 @@ class App extends Component {
           <Snackbar
             open={this.state.snackbar.openSnackbar}
             autoHideDuration={6000}
+            style={{position:"absolute"}}
             onClose={this.SnackbarClose}
             anchorOrigin={this.state.snackbar.position}
           >
@@ -274,6 +276,8 @@ class App extends Component {
           <Route exact path="/" component={SignIn}>
             {this.state.userLoggedIn ? (
               <HomeViewMemos
+                decryptToOrgObj={this.decryptToOrgObj}
+                getLoggedInUserData={this.getLoggedInUserData}
                 createUserMemo={this.createUserMemo}
                 logoutUser={this.logoutUser}
               />
