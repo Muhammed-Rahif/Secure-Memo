@@ -152,8 +152,49 @@ class App extends Component {
     window.location.reload();
   };
 
-  createUserMemo = (userId, memoData) => {
-    alert("createUserMemo");
+  getLoggedInUserData = () => {
+    return JSON.parse(window.localStorage.getItem(clientStorageKey));
+  };
+
+  createUserMemo = (memoData) => {
+    this.backdropToggle();
+    memoData = this.encryptObj(memoData);
+    var userData = this.getLoggedInUserData();
+    Object.assign(userData, memoData);
+    console.log(userData);
+    $.ajax({
+      method: "post",
+      url: "./create-user-memo",
+      data: userData,
+      success: (response) => {
+        this.backdropToggle();
+        if (response.status) {
+          this.setState({
+            snackbar: {
+              openSnackbar: true,
+              msg: response.firstMemo ? "Successfully saved your first memo.!":"Successfully saved your memo.!",
+              type: "success",
+              position: {
+                vertical: "left",
+                horizontal: "bottom",
+              },
+            },
+          });
+        } else {
+          this.setState({
+            snackbar: {
+              openSnackbar: true,
+              msg: "Oops..! Something went wrong, Try again.",
+              type: "error",
+              position: {
+                vertical: "left",
+                horizontal: "bottom",
+              },
+            },
+          });
+        }
+      },
+    });
   };
 
   updateUserMemo = (userId, memoId, memoData) => {
@@ -210,10 +251,7 @@ class App extends Component {
     return (
       <Router>
         {/* Backdrop */}
-        <Backdrop
-          style={{zIndex:999999}}
-          open={this.state.backdropOpen}
-        >
+        <Backdrop style={{ zIndex: 999999 }} open={this.state.backdropOpen}>
           <CircularProgress color="inherit" />
         </Backdrop>
         {/* Alert a snackbar */}
@@ -235,7 +273,10 @@ class App extends Component {
         <Switch>
           <Route exact path="/" component={SignIn}>
             {this.state.userLoggedIn ? (
-              <HomeViewMemos createUserMemo={this.createUserMemo} logoutUser={this.logoutUser} />
+              <HomeViewMemos
+                createUserMemo={this.createUserMemo}
+                logoutUser={this.logoutUser}
+              />
             ) : (
               <Redirect push to="./signup" />
             )}

@@ -57,13 +57,15 @@ export default function FullScreenDialog(props) {
     setValue,
     handleSubmit,
     formState: { errors },
-  } = useForm({ reValidateMode: "onChange" });
+  } = useForm({
+    reValidateMode: "onChange",
+    defaultValues: { memoType: "allMemos" },
+  });
 
   const onSubmit = (formData) => {
     console.log(formData);
     props.createUserMemo(formData);
     handleClose();
-    props.showSnackBar(true);
   };
 
   const changePreviewScrollable = (event) => {
@@ -158,7 +160,8 @@ export default function FullScreenDialog(props) {
                 fullWidth
                 ref={register("memoTitle", { required: true, minLength: 10 })}
                 error={errors.memoTitle ? true : false}
-                onChange={(e)=>{
+                autoFocus={errors.memoTitle ? true : false}
+                onChange={(e) => {
                   setValue("memoTitle", e.target.value, {
                     shouldValidate: true,
                   });
@@ -199,6 +202,7 @@ export default function FullScreenDialog(props) {
                   required: true,
                   minLength: 12,
                 })}
+                autoFocus={errors.memoBody ? true : false}
                 error={errors.memoBody ? true : false}
                 helperText={
                   errors.memoBody
@@ -229,6 +233,7 @@ export default function FullScreenDialog(props) {
                   minHeight: textAreaHeight,
                   margin: ".13rem",
                   width: "100vw",
+                  overflowX: "scroll",
                   overflowY: "visible",
                   paddingLeft: ".7rem",
                 }}
@@ -260,6 +265,7 @@ export default function FullScreenDialog(props) {
                     });
                   }}
                   {...register("memoType", { required: true })}
+                  autoFocus={errors.memoType ? true : false}
                   error={errors.memoType ? true : false}
                   helperText="Memo will add to all memos section by default."
                 >

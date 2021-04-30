@@ -19,7 +19,6 @@ import SearchIcon from "@material-ui/icons/Search";
 import MoreIcon from "@material-ui/icons/MoreVert";
 import TemporaryDrawer from "./TemporaryDrawer";
 import CreateMemo from "./CreateMemo";
-import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import Tooltip from "@material-ui/core/Tooltip";
 import Menu from "@material-ui/core/Menu";
@@ -116,7 +115,6 @@ export default function BottomAppBar(props) {
   const classes = useStyles();
   const [drawer, setDrawer] = useState(false);
   const [createMemo, setCreateMemo] = useState(false);
-  const [snackBar, setSnackBar] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleMenuClick = (event) => {
@@ -125,29 +123,6 @@ export default function BottomAppBar(props) {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleSnackBarClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setSnackBar(false);
-  };
-
-  const showSnackBar = (message, severity) => {
-    return (
-      <Snackbar
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        open={snackBar}
-        autoHideDuration={6000}
-        onClose={handleSnackBarClose}
-      >
-        <Alert onClose={handleSnackBarClose} severity={severity}>
-          {message}
-        </Alert>
-      </Snackbar>
-    );
   };
 
   return (
@@ -256,8 +231,7 @@ export default function BottomAppBar(props) {
         </Toolbar>
       </AppBar>
       <TemporaryDrawer anchor="left" active={drawer} />
-      {snackBar ? showSnackBar("Memo saved successsfully..!", "success") : null}
-      {createMemo ? <CreateMemo createUserMemo={props.createUserMemo} showSnackBar={setSnackBar} /> : null}
+      {createMemo ? <CreateMemo createUserMemo={props.createUserMemo} /> : null}
     </React.Fragment>
   );
 }

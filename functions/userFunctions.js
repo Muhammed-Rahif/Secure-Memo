@@ -116,20 +116,49 @@ module.exports = {
         });
     });
   },
-  createUserMemo: (data) => {
-    // return new Promise((resolve, reject) => {
-    //     data.memoDate = new Date();
-    //     data.memoId = uuidv4();
-    //     var tempObj = {
-    //       userId : data.userId,
-    //       userMemos:{
-    //         allMemos :[],
-    //         hiddenMemos : [],
-    //         secureMemos : []
-    //       }
-    //     }
-    //     tempObj.userMemos[data.memoType].push(data);
-    //     db.collection(collections)
-    // });
+  createUserMemo: (memoData) => {
+    return new Promise(async(resolve, reject) => {
+      var userId = memoData.userId;
+      var memoType = await decryptToOrgStr(memoData.memoType);
+      var userEmail = memoData.userEmail;
+      delete memoData.userId;
+      delete memoData.userEmail;
+      delete memoData.memoType;
+      memoData.memoDate = new Date();
+      memoData.memoId = uuidv4();
+      db.get()
+        .collection(collections.MEMOS_COLLECTION)
+        .findOne({ userId: userId })
+        .then((userMemosExist) => {
+          if (userMemosExist) {
+            var memoArray = "userMemos."+memoType;
+            db.get()
+              .collection(collections.MEMOS_COLLECTION)
+              .updateOne(
+                { userId: userId },
+                {
+                  $push: { [memoArray]: memoData },
+                }
+              ).then(()=>{
+                resolve({ status: true, firstMemo: false });
+              })
+          } else {
+            var tempObj = {
+              userId: userId,
+              userMemos: {
+                allMemos: new Array(),
+                hiddenMemos: new Array(),
+                secureMemos: new Array(),
+              },
+            };
+            tempObj.userMemos[memoType].push(memoData);
+            db.get().collection(collections.MEMOS_COLLECTION)
+              .insertOne(tempObj)
+              .then(() => {
+                resolve({ status: true, firstMemo: true });
+              });
+          }
+        });
+    });
   },
 };

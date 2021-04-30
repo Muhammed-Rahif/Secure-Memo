@@ -39,12 +39,8 @@ function verifyUserLogin(req, res, next) {
 
 app.post("/signup-user", (req, res) => {
   let userData = req.body;
-  // req.session.user = {};
-  // req.session.userLoggedIn = false;
   userFunctions.signUpUser(userData).then((response) => {
     if (response.status) {
-      req.session.user.userData = response.userData;
-      req.session.userLoggedIn = true;
       res.json(response);
     } else {
       res.json(response);
@@ -54,12 +50,8 @@ app.post("/signup-user", (req, res) => {
 
 app.post("/signin-user", (req, res) => {
   let userData = req.body;
-  // req.session.user = {};
-  // req.session.userLoggedIn = false;
   userFunctions.signInUser(userData).then((response) => {
     if (response.status) {
-      req.session.user.userData = response.userData;
-      req.session.userLoggedIn = true;
       res.json(response);
     } else {
       res.json(response);
@@ -68,8 +60,11 @@ app.post("/signin-user", (req, res) => {
 });
 
 app.post("/create-user-memo", (req, res) => {
-  let userData = req.body;
-  userFunctions
+  let memoData = req.body;
+  console.log(memoData);
+  userFunctions.createUserMemo(memoData).then((response) => {
+    res.json(response);
+  });
 });
 
 // Redirect to react app
