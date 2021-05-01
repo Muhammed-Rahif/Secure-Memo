@@ -78,17 +78,14 @@ module.exports = {
   },
   signInUser: (userData) => {
     return new Promise(async (resolve, reject) => {
-      console.log(userData.email);
       let userEmail = userData.email;
       delete userData.email;
       userData = await decryptToOrgObj(userData);
       userData.email = userEmail;
-      console.log(userData.email);
       db.get()
         .collection(collections.USERS_COLLECTION)
         .findOne({ email: userData.email })
         .then(async (userExist) => {
-          console.log(userExist);
           if (userExist) {
             if (await bcrypt.compare(userData.password, userExist.password)) {
               resolve({
@@ -173,6 +170,29 @@ module.exports = {
         .findOne({ userId: userId })
         .then((userMemoData) => {
           resolve(userMemoData.userMemos[memoType]);
+        });
+    });
+  },
+  getUserMemo: (memoDeta) => {
+    return new Promise(async (resolve, reject) => {
+      var memosArray = "userMemos." + memoDeta.memoType;
+      var memoDoc = `userMemos.${memoDeta.memoType}.memoId`;
+      db.get()
+        .collection(collections.MEMOS_COLLECTION)
+        .aggregate([
+          { $match: { userId: memoDeta.userId } },
+          { $unwind: "$" + memosArray },
+          {
+            $match: {
+              [memoDoc]: memoDeta.memoId,
+            },
+          },
+          { $project: { _id: 0, [memosArray]: 1 } },
+        ])
+        .toArray()
+        .then((memoData) => {
+          console.log(memoData[0].userMemos.allMemos);
+          resolve(memoData[0].userMemos.allMemos);
         });
     });
   },

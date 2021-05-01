@@ -4,6 +4,7 @@ import "./App.css";
 
 import $ from "jquery";
 const CryptoJS = require("crypto-js");
+var store = require("store");
 
 import SignIn from "./Components/SignIn";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
@@ -29,14 +30,14 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userData: null,
+      userData: false,
       userLoggedIn: false,
       myMemos: [],
       snackbar: {
         openSnackbar: false,
         msg: "",
         type: "success",
-        position: { vertical: "left", horizontal: "bottom" },
+        position: { vertical: "bottom", horizontal: "left" },
       },
       backdropOpen: false,
     };
@@ -66,7 +67,6 @@ class App extends Component {
   decryptToOrgObj = (obj) => {
     let decObj = {};
     Object.keys(obj).map((itm) => {
-      console.log(obj[itm]);
       decObj[itm] = CryptoJS.AES.decrypt(obj[itm], encKey).toString(
         CryptoJS.enc.Utf8
       );
@@ -100,8 +100,8 @@ class App extends Component {
               msg: `Can't sign up : ${response.errorMsg}`,
               type: "error",
               position: {
-                vertical: "center",
-                horizontal: "top",
+                vertical: "top",
+                horizontal: "center",
               },
             },
           });
@@ -116,7 +116,6 @@ class App extends Component {
     delete userData.email;
     userData = this.encryptObj(userData);
     userData.email = this.encUnSaltStr(userEmail);
-    console.log(userData);
     $.ajax({
       method: "post",
       url: "./signin-user",
@@ -136,8 +135,8 @@ class App extends Component {
               msg: `Can't sign in : ${response.errorMsg}`,
               type: "error",
               position: {
-                vertical: "center",
-                horizontal: "top",
+                vertical: "top",
+                horizontal: "center",
               },
             },
           });
@@ -148,12 +147,14 @@ class App extends Component {
 
   logoutUser = () => {
     this.setState({ userLoggedIn: false, userData: null });
-    window.localStorage.setItem(clientStorageKey, "null");
+    store.remove(clientStorageKey);
     window.location.reload();
   };
 
   getLoggedInUserData = () => {
-    return JSON.parse(window.localStorage.getItem(clientStorageKey));
+    let userData = store.get(clientStorageKey);
+    console.log(userData);
+    return userData;
   };
 
   createUserMemo = (memoData) => {
@@ -161,7 +162,6 @@ class App extends Component {
     memoData = this.encryptObj(memoData);
     var userData = this.getLoggedInUserData();
     Object.assign(userData, memoData);
-    console.log(userData);
     $.ajax({
       method: "post",
       url: "./create-user-memo",
@@ -177,8 +177,8 @@ class App extends Component {
                 : "Successfully saved your memo.!",
               type: "success",
               position: {
-                vertical: "left",
-                horizontal: "bottom",
+                vertical: "bottom",
+                horizontal: "left",
               },
             },
           });
@@ -189,8 +189,8 @@ class App extends Component {
               msg: "Oops..! Something went wrong, Try again.",
               type: "error",
               position: {
-                vertical: "left",
-                horizontal: "bottom",
+                vertical: "bottom",
+                horizontal: "left",
               },
             },
           });
@@ -224,19 +224,16 @@ class App extends Component {
   };
 
   verifyUserLogin = () => {
+    console.log(this.state.userData);
     let userData = this.state.userData;
-    let userLocalStorage = JSON.parse(
-      window.localStorage.getItem(clientStorageKey)
-    );
-    console.log(userData);
+    let userLocalStorage = store.get(clientStorageKey);
     if (userLocalStorage) {
-      console.log(userData);
       this.setState({
         userData: userLocalStorage,
         userLoggedIn: true,
       });
     } else {
-      window.localStorage.setItem(clientStorageKey, JSON.stringify(userData));
+      store.set(clientStorageKey, userData);
     }
     console.log(this.state.userData);
   };
@@ -246,9 +243,6 @@ class App extends Component {
   };
 
   render() {
-    console.log(JSON.parse(window.localStorage.getItem(clientStorageKey)));
-    console.log(this.state.userLoggedIn);
-
     return (
       <Router>
         {/* Backdrop */}
@@ -260,7 +254,7 @@ class App extends Component {
           <Snackbar
             open={this.state.snackbar.openSnackbar}
             autoHideDuration={6000}
-            style={{position:"absolute"}}
+            style={{ position: "absolute" }}
             onClose={this.SnackbarClose}
             anchorOrigin={this.state.snackbar.position}
           >
@@ -300,7 +294,12 @@ class App extends Component {
             )}
           </Route>
           <Route path="/my-memos">
-            <HomeViewMemos logoutUser={this.logoutUser} />
+            <HomeViewMemos
+              decryptToOrgObj={this.decryptToOrgObj}
+              getLoggedInUserData={this.getLoggedInUserData}
+              createUserMemo={this.createUserMemo}
+              logoutUser={this.logoutUser}
+            />
           </Route>
           <Route path="/my-profile">
             <MyProfile />
@@ -309,7 +308,10 @@ class App extends Component {
             <AboutUs />
           </Route>
           <Route path="/view-memo/:id">
-            <ViewMemo />
+            <ViewMemo
+              getLoggedInUserData={this.getLoggedInUserData}
+              decryptToOrgObj={this.decryptToOrgObj}
+            />
           </Route>
           <Route path="/edit-memo/:id">
             <EditMemo />

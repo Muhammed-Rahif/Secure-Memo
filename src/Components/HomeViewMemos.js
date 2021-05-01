@@ -23,6 +23,7 @@ import MuiAlert from "@material-ui/lab/Alert";
 import Tooltip from "@material-ui/core/Tooltip";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
+const clientStorageKey = "SecureMemoStorage";
 import $ from "jquery";
 
 // {messages.map(({ id, primary, secondary, person }) => (
@@ -105,10 +106,11 @@ export default function BottomAppBar(props) {
   };
 
   React.useEffect(() => {
+    let userData = props.getLoggedInUserData();
     $.ajax({
       url: "./get-user-memos",
       data: {
-        userId: props.getLoggedInUserData().userId,
+        userId: userData.userId,
         memoType: "allMemos",
       },
       method: "post",

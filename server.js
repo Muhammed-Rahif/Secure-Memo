@@ -61,22 +61,26 @@ app.post("/signin-user", (req, res) => {
 
 app.post("/create-user-memo", (req, res) => {
   let memoData = req.body;
-  console.log(memoData);
   userFunctions.createUserMemo(memoData).then((response) => {
     res.json(response);
   });
 });
 
 app.post("/get-user-memos", (req, res) => {
-  userFunctions.getUserMemos(req.body).then((memosArray)=>{
+  userFunctions.getUserMemos(req.body).then((memosArray) => {
     res.json(memosArray);
-  })
+  });
+});
+
+app.post("/get-memo-data", (req, res) => {
+  userFunctions.getUserMemo(req.body).then((memoData) => {
+    res.json(memoData);
+  });
 });
 
 // Redirect to react app
 
 app.get("/", (req, res) => {
-  console.log(req.session);
   res.sendFile(path.resolve(__dirname, "build", "index.html"));
 });
 
@@ -89,7 +93,6 @@ app.get("/signup", (req, res) => {
 });
 
 app.get("/*", (req, res) => {
-  console.log(req.session);
   res.sendFile(path.resolve(__dirname, "build", "index.html"));
 });
 

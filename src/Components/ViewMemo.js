@@ -27,7 +27,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import ReactMarkdown from "react-markdown";
 import HomeIcon from "@material-ui/icons/Home";
 import DeleteIcon from "@material-ui/icons/Delete";
-
+import $ from "jquery";
 
 const useStyles = makeStyles((theme) => ({
   text: {
@@ -65,12 +65,13 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-export default function BottomAppBar() {
+export default function BottomAppBar(props) {
   const classes = useStyles();
   const [drawer, setDrawer] = useState(false);
   const [createMemo, setCreateMemo] = useState(false);
   const [snackBar, setSnackBar] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [memoData, setMemoData] = React.useState("");
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -103,15 +104,34 @@ export default function BottomAppBar() {
     );
   };
 
+  useEffect(() => {
+    var memoId = window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
+    console.log(memoId);
+    console.log(window.location.href);
+    $.ajax({
+      url: "/get-memo-data",
+      data: {
+        userId: props.getLoggedInUserData().userId,
+        memoId: memoId,
+        memoType:"allMemos"
+      },
+      method: "post",
+      success: (memoData) => {
+        setMemoData(props.decryptToOrgObj(memoData))
+        console.log(memoData);
+      },
+    });
+  });
+
   return (
     <React.Fragment>
       <CssBaseline />
       <Paper square className={classes.paper}>
         <Typography className={classes.text} variant="h5" gutterBottom>
-          Your Memo Heading
+          {memoData.memoTitle}
         </Typography>
         <List className={classes.list}>
-          <ReactMarkdown />
+          <ReactMarkdown children={memoData.memoBody} />
         </List>
       </Paper>
       <AppBar position="fixed" color="primary" className={classes.appBar}>
@@ -169,7 +189,7 @@ export default function BottomAppBar() {
             onClose={handleMenuClose}
           >
             <MenuItem
-            id="editBtn"
+              id="editBtn"
               onClick={() => {
                 handleMenuClose();
                 createMemo
@@ -194,7 +214,9 @@ export default function BottomAppBar() {
         </Toolbar>
       </AppBar>
       <TemporaryDrawer anchor="left" active={drawer} />
-      {snackBar ? showSnackBar("Memo updated successsfully..!", "success") : null}
+      {snackBar
+        ? showSnackBar("Memo updated successsfully..!", "success")
+        : null}
       {createMemo ? <EditMemo showSnackBar={setSnackBar} /> : null}
     </React.Fragment>
   );
