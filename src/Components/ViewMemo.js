@@ -27,6 +27,12 @@ import MenuItem from "@material-ui/core/MenuItem";
 import ReactMarkdown from "react-markdown";
 import HomeIcon from "@material-ui/icons/Home";
 import DeleteIcon from "@material-ui/icons/Delete";
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
 import $ from "jquery";
 
 const useStyles = makeStyles((theme) => ({
@@ -68,10 +74,19 @@ function Alert(props) {
 export default function BottomAppBar(props) {
   const classes = useStyles();
   const [drawer, setDrawer] = useState(false);
-  const [createMemo, setCreateMemo] = useState(false);
+  const [editMemo, setEditMemo] = useState(false);
   const [snackBar, setSnackBar] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [memoData, setMemoData] = React.useState("");
+  const [openAlert, setOpenAlert] = React.useState(false);
+
+  const handleAlertOpen = () => {
+    setOpenAlert(true);
+  };
+
+  const handleAlertClose = () => {
+    setOpenAlert(false);
+  };
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -105,7 +120,9 @@ export default function BottomAppBar(props) {
   };
 
   useEffect(() => {
-    var memoId = window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
+    var memoId = window.location.href.substring(
+      window.location.href.lastIndexOf("/") + 1
+    );
     console.log(memoId);
     console.log(window.location.href);
     $.ajax({
@@ -113,12 +130,24 @@ export default function BottomAppBar(props) {
       data: {
         userId: props.getLoggedInUserData().userId,
         memoId: memoId,
-        memoType:"allMemos"
+        memoType: "allMemos",
       },
       method: "post",
       success: (memoData) => {
-        setMemoData(props.decryptToOrgObj(memoData))
-        console.log(memoData);
+        console.log(memoData.memoId);
+        if (memoData.memoId) {
+          let memoId = memoData.memoId;
+          let memoDate = memoData.memoDate;
+          delete memoData.memoId;
+          delete memoData.memoDate;
+          memoData = props.decryptToOrgObj(memoData);
+          memoData.memoId = memoId;
+          memoData.memoDate = memoDate;
+          setMemoData(memoData);
+          console.log(memoData);
+      } else {
+        window.location.href="/"
+      }
       },
     });
   });
@@ -130,7 +159,7 @@ export default function BottomAppBar(props) {
         <Typography className={classes.text} variant="h5" gutterBottom>
           {memoData.memoTitle}
         </Typography>
-        <List className={classes.list}>
+        <List style={{ overflowX: "scroll" }} className={classes.list}>
           <ReactMarkdown children={memoData.memoBody} />
         </List>
       </Paper>
@@ -154,11 +183,11 @@ export default function BottomAppBar(props) {
               aria-label="add"
               className={classes.fabButton}
               onClick={() => {
-                createMemo
+                editMemo
                   ? setTimeout(() => {
-                      setCreateMemo(false);
+                      setEditMemo(false);
                     }, 500)
-                  : setCreateMemo(true);
+                  : setEditMemo(true);
               }}
             >
               <EditIcon />
@@ -192,17 +221,22 @@ export default function BottomAppBar(props) {
               id="editBtn"
               onClick={() => {
                 handleMenuClose();
-                createMemo
+                editMemo
                   ? setTimeout(() => {
-                      setCreateMemo(false);
+                      setEditMemo(false);
                     }, 500)
-                  : setCreateMemo(true);
+                  : setEditMemo(true);
               }}
             >
               <EditIcon fontSize="small" />
               Edit
             </MenuItem>
-            <MenuItem onClick={handleMenuClose}>
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                setOpenAlert(true);
+              }}
+            >
               <DeleteIcon fontSize="small" />
               Delete
             </MenuItem>
@@ -217,7 +251,44 @@ export default function BottomAppBar(props) {
       {snackBar
         ? showSnackBar("Memo updated successsfully..!", "success")
         : null}
-      {createMemo ? <EditMemo showSnackBar={setSnackBar} /> : null}
+      {editMemo ? <EditMemo showSnackBar={setSnackBar} /> : null}
+      {openAlert ? (
+        <Dialog
+          open={openAlert}
+          onClose={handleAlertClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"Are you sure to delete this memo ?"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Once deleted you will not able to undo or recover it. It will
+              permanently deleted.. Make sure that want move forward.. If so
+              click the OK button down below..!
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleAlertClose} color="primary">
+              Nop.. Don't delete this memo.!
+            </Button>
+            <Button
+              onClick={() => {
+                handleAlertClose();
+                props.dltUserMemo({
+                  memoId: memoData.memoId,
+                  memoType: memoData.memoType,
+                });
+              }}
+              color="secondary"
+              autoFocus
+            >
+              Ok, Delete this memo.. I am sure..!
+            </Button>
+          </DialogActions>
+        </Dialog>
+      ) : null}
     </React.Fragment>
   );
 }

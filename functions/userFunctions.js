@@ -121,7 +121,6 @@ module.exports = {
       var userEmail = memoData.userEmail;
       delete memoData.userId;
       delete memoData.userEmail;
-      delete memoData.memoType;
       memoData.memoDate = new Date();
       memoData.memoId = uuidv4();
       db.get()
@@ -191,8 +190,24 @@ module.exports = {
         ])
         .toArray()
         .then((memoData) => {
-          console.log(memoData[0].userMemos.allMemos);
           resolve(memoData[0].userMemos.allMemos);
+        });
+    });
+  },
+  deleteUserMemo: (memoData) => {
+    console.log(memoData);
+    return new Promise((resolve, reject) => {
+      var memoArray = "userMemos." + "allMemos";
+      db.get()
+        .collection(collections.MEMOS_COLLECTION)
+        .updateOne(
+          { userId: memoData.userId },
+          {
+            $pull: { [memoArray]: { memoId: memoData.memoId } },
+          }
+        )
+        .then(() => {
+          resolve({ status: true });
         });
     });
   },

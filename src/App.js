@@ -207,8 +207,44 @@ class App extends Component {
     alert("editUserMemo");
   };
 
-  dltUserMemo = (userId, memoId) => {
-    alert("dltUserMemo");
+  dltUserMemo = (memoData) => {
+    this.backdropToggle();
+    var userData = this.getLoggedInUserData();
+    Object.assign(userData, memoData);
+    $.ajax({
+      method: "post",
+      url: "/delete-user-memo",
+      data: userData,
+      success: (response) => {
+        this.backdropToggle();
+        if (response.status) {
+          this.setState({
+            snackbar: {
+              openSnackbar: true,
+              msg: "Successfully deleted.!",
+              type: "success",
+              position: {
+                vertical: "bottom",
+                horizontal: "left",
+              },
+            },
+          });
+          window.location.href = "/";
+        } else {
+          this.setState({
+            snackbar: {
+              openSnackbar: true,
+              msg: "Oops..! Something went wrong, Try again.",
+              type: "error",
+              position: {
+                vertical: "bottom",
+                horizontal: "left",
+              },
+            },
+          });
+        }
+      },
+    });
   };
 
   editUserMemo = (userId, memoId) => {
@@ -309,6 +345,7 @@ class App extends Component {
           </Route>
           <Route path="/view-memo/:id">
             <ViewMemo
+              dltUserMemo={this.dltUserMemo}
               getLoggedInUserData={this.getLoggedInUserData}
               decryptToOrgObj={this.decryptToOrgObj}
             />

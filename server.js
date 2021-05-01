@@ -78,6 +78,14 @@ app.post("/get-memo-data", (req, res) => {
   });
 });
 
+app.post("/delete-user-memo", (req, res) => {
+  let memoData = req.body;
+  console.log(memoData);
+  userFunctions.deleteUserMemo(memoData).then((response) => {
+    res.json(response);
+  });
+});
+
 // Redirect to react app
 
 app.get("/", (req, res) => {
