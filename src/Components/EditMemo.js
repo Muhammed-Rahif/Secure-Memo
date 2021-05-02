@@ -237,15 +237,7 @@ export default function FullScreenDialog(props) {
                   color="primary"
                   style={{ paddingBottom: 0 }}
                   checked={mdScrollable}
-                  onChange={(e) => {
-                    setValue("memoType", e.target.value, {
-                      shouldValidate: true,
-                    });
-                  }}
-                  {...register("memoType", { required: true })}
-                  autoFocus={errors.memoType ? true : false}
-                  error={errors.memoType ? true : false}
-                  helperText="Memo will add to all memos section by default."
+                  onClick={ switchHandler }
                 />
               </p>
             </ListItem>
