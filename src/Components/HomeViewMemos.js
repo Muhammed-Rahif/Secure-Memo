@@ -116,7 +116,6 @@ export default function BottomAppBar(props) {
       method: "post",
       success: (allMemos) => {
         setMemos(allMemos);
-        console.log(memos);
       },
     });
   });
@@ -136,7 +135,6 @@ export default function BottomAppBar(props) {
             delete itm.memoId;
             delete itm.memoDate;
             itm = props.decryptToOrgObj(itm);
-            console.log(itm);
             itm.memoBody = itm.memoBody.substring(0, 45);
             return (
               <ListItem

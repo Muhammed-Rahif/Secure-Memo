@@ -59,11 +59,10 @@ export default function FullScreenDialog(props) {
     formState: { errors },
   } = useForm({
     reValidateMode: "onChange",
-    defaultValues: { memoType: "allMemos" },
+    defaultValues: { memoType: "allMemos", modified: "false" },
   });
 
   const onSubmit = (formData) => {
-    console.log(formData);
     props.createUserMemo(formData);
     handleClose();
   };
@@ -105,8 +104,6 @@ export default function FullScreenDialog(props) {
     changePreviewScrollable(event);
   };
 
-  console.log(errors);
-  console.log(textAreaContent);
   return (
     <div>
       <Dialog
@@ -120,6 +117,7 @@ export default function FullScreenDialog(props) {
           autoComplete="off"
           onSubmit={handleSubmit(onSubmit)}
         >
+          <input hidden="true" ref={register("modified")} />
           <AppBar className={classes.appBar}>
             <Toolbar>
               <Tooltip title="Cancel" arrow>

@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
@@ -48,15 +49,32 @@ export default function FullScreenDialog(props) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   //   const [openSuccesSnackBar, setOpenSuccesSnackBar] = React.useState(false);
-  const [addMemoTo, setAddMemoTo] = React.useState("allMemos");
+  const [addMemoTo, setAddMemoTo] = React.useState(props.memoType);
   const [textAreaHeight, setTextAreaHeight] = React.useState(null);
   const [mdScrollable, setMdScrollable] = React.useState(false);
-  const [memoHeading, setMemoHeading] = React.useState(
-    "Some memo heading content"
-  );
-  const [textAreaContent, setTextAreaContent] = React.useState(
-    "Some memo body content"
-  );
+  const [memoHeading, setMemoHeading] = React.useState(props.memoTitle);
+  const [textAreaContent, setTextAreaContent] = React.useState(props.memoBody);
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    reValidateMode: "onChange",
+    defaultValues: {
+      memoBody: props.memoBody,
+      memoTitle: props.memoTitle,
+      memoType: props.memoType,
+      modified: "true",
+      memoId: props.memoId,
+    },
+  });
+
+  const onSubmit = (formData) => {
+    console.log(formData);
+    props.updateUserMemo(formData);
+    handleClose();
+  };
 
   const changePreviewScrollable = (event) => {
     setMdScrollable(event.target.checked);
@@ -71,7 +89,6 @@ export default function FullScreenDialog(props) {
 
   useEffect(() => {
     setOpen(true);
-    setAddMemoTo("hiddenMemos");
     setTimeout(() => {
       setTextAreaHeight(
         document.getElementById("bodyTextarea").clientHeight +
@@ -107,39 +124,42 @@ export default function FullScreenDialog(props) {
         onClose={handleClose}
         TransitionComponent={Transition}
       >
-        <AppBar className={classes.appBar}>
-          <Toolbar>
-            <Tooltip title="Cancel" arrow>
-              <IconButton
-                edge="start"
-                color="inherit"
-                onClick={handleClose}
-                aria-label="close"
-              >
-                <CloseIcon />
-              </IconButton>
-            </Tooltip>
-            <Typography variant="h6" className={classes.title}>
-              Edit Memo
-            </Typography>
-            <Tooltip title="Save Memo" arrow>
-              <Button
-                autoFocus
-                color="inherit"
-                onClick={() => {
-                  handleClose();
-                  props.showSnackBar(true);
-                }}
-                variant="outlined"
-                startIcon={<PublishIcon />}
-              >
-                update
-              </Button>
-            </Tooltip>
-          </Toolbar>
-        </AppBar>
-        <List>
-          <form className={classes.form} autoComplete="off">
+        <form
+          className={classes.form}
+          autoComplete="off"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <input hidden="true" ref={register("modified")} />
+          <input hidden="true" ref={register("memoId")} />
+          <AppBar className={classes.appBar}>
+            <Toolbar>
+              <Tooltip title="Cancel" arrow>
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  onClick={handleClose}
+                  aria-label="close"
+                >
+                  <CloseIcon />
+                </IconButton>
+              </Tooltip>
+              <Typography variant="h6" className={classes.title}>
+                Edit Memo
+              </Typography>
+              <Tooltip title="Update Memo" arrow>
+                <Button
+                  autoFocus
+                  color="inherit"
+                  variant="outlined"
+                  startIcon={<PublishIcon />}
+                  type="submit"
+                >
+                  update
+                </Button>
+              </Tooltip>
+            </Toolbar>
+          </AppBar>
+          <List>
             <ListItem style={{ paddingBottom: 0 }}>
               <ListItemText primary="Memo Heading" />
             </ListItem>
@@ -150,9 +170,22 @@ export default function FullScreenDialog(props) {
                 variant="outlined"
                 fullWidth
                 value={memoHeading}
-                onChange={() => {
-                  setMemoHeading(event.target.value);
+                ref={register("memoTitle", { required: true, minLength: 10 })}
+                error={errors.memoTitle ? true : false}
+                autoFocus={errors.memoTitle ? true : false}
+                onChange={(e) => {
+                  setMemoHeading(e.target.value);
+                  setValue("memoTitle", e.target.value, {
+                    shouldValidate: true,
+                  });
                 }}
+                helperText={
+                  errors.memoTitle
+                    ? errors.memoTitle.type === "required"
+                      ? "Memo Title is required."
+                      : "Memo Title minimum lenght is 10."
+                    : "Memo Title here."
+                }
               />
             </ListItem>
             <Divider className={classes.devider} />
@@ -172,7 +205,25 @@ export default function FullScreenDialog(props) {
                 fullWidth
                 aria-label="textarea"
                 value={textAreaContent}
-                onChange={updateMarkdown}
+                onChange={(e) => {
+                  updateMarkdown(e);
+                  setValue("memoBody", e.target.value, {
+                    shouldValidate: true,
+                  });
+                }}
+                ref={register("memoBody", {
+                  required: true,
+                  minLength: 12,
+                })}
+                autoFocus={errors.memoBody ? true : false}
+                error={errors.memoBody ? true : false}
+                helperText={
+                  errors.memoBody
+                    ? errors.memoBody.type === "required"
+                      ? "Memo body is required."
+                      : "Memo body Minimum lenght is 12."
+                    : "Memo Body here."
+                }
               />
             </ListItem>
             <Divider className={classes.devider} />
@@ -186,6 +237,15 @@ export default function FullScreenDialog(props) {
                   color="primary"
                   style={{ paddingBottom: 0 }}
                   checked={mdScrollable}
+                  onChange={(e) => {
+                    setValue("memoType", e.target.value, {
+                      shouldValidate: true,
+                    });
+                  }}
+                  {...register("memoType", { required: true })}
+                  autoFocus={errors.memoType ? true : false}
+                  error={errors.memoType ? true : false}
+                  helperText="Memo will add to all memos section by default."
                 />
               </p>
             </ListItem>
@@ -237,8 +297,8 @@ export default function FullScreenDialog(props) {
               </FormControl>
             </ListItem>
             <Divider className={classes.devider} />
-          </form>
-        </List>
+          </List>
+        </form>
       </Dialog>
     </div>
   );

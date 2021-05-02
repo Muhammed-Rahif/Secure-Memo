@@ -123,8 +123,6 @@ export default function BottomAppBar(props) {
     var memoId = window.location.href.substring(
       window.location.href.lastIndexOf("/") + 1
     );
-    console.log(memoId);
-    console.log(window.location.href);
     $.ajax({
       url: "/get-memo-data",
       data: {
@@ -134,7 +132,6 @@ export default function BottomAppBar(props) {
       },
       method: "post",
       success: (memoData) => {
-        console.log(memoData.memoId);
         if (memoData.memoId) {
           let memoId = memoData.memoId;
           let memoDate = memoData.memoDate;
@@ -144,10 +141,9 @@ export default function BottomAppBar(props) {
           memoData.memoId = memoId;
           memoData.memoDate = memoDate;
           setMemoData(memoData);
-          console.log(memoData);
-      } else {
-        window.location.href="/"
-      }
+        } else {
+          window.location.href = "/";
+        }
       },
     });
   });
@@ -251,7 +247,17 @@ export default function BottomAppBar(props) {
       {snackBar
         ? showSnackBar("Memo updated successsfully..!", "success")
         : null}
-      {editMemo ? <EditMemo showSnackBar={setSnackBar} /> : null}
+      {editMemo ? (
+        <EditMemo
+          memoTitle={memoData.memoTitle}
+          memoBody={memoData.memoBody}
+          memoId={memoData.memoId}
+          memoDate={memoData.memoDate}
+          memoType={memoData.memoType}
+          showSnackBar={setSnackBar}
+          updateUserMemo={props.updateUserMemo}
+        />
+      ) : null}
       {openAlert ? (
         <Dialog
           open={openAlert}

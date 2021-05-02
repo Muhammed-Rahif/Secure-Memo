@@ -153,7 +153,6 @@ class App extends Component {
 
   getLoggedInUserData = () => {
     let userData = store.get(clientStorageKey);
-    console.log(userData);
     return userData;
   };
 
@@ -199,8 +198,47 @@ class App extends Component {
     });
   };
 
-  updateUserMemo = (userId, memoId, memoData) => {
-    alert("updateUserMemo");
+  updateUserMemo = (memoData) => {
+    this.backdropToggle();
+    let memoId = memoData.memoId;
+    delete memoData.memoId;
+    memoData = this.encryptObj(memoData);
+    memoData.memoId = memoId;
+    var userData = this.getLoggedInUserData();
+    Object.assign(userData, memoData);
+    $.ajax({
+      method: "post",
+      url: "/update-user-memo",
+      data: userData,
+      success: (response) => {
+        this.backdropToggle();
+        if (response.status) {
+          this.setState({
+            snackbar: {
+              openSnackbar: true,
+              msg: "Successfully updated your memo.!",
+              type: "success",
+              position: {
+                vertical: "bottom",
+                horizontal: "left",
+              },
+            },
+          });
+        } else {
+          this.setState({
+            snackbar: {
+              openSnackbar: true,
+              msg: "Oops..! Something went wrong, Try again.",
+              type: "error",
+              position: {
+                vertical: "bottom",
+                horizontal: "left",
+              },
+            },
+          });
+        }
+      },
+    });
   };
 
   getUserMemo = (userId, memoId) => {
@@ -260,7 +298,6 @@ class App extends Component {
   };
 
   verifyUserLogin = () => {
-    console.log(this.state.userData);
     let userData = this.state.userData;
     let userLocalStorage = store.get(clientStorageKey);
     if (userLocalStorage) {
@@ -271,7 +308,6 @@ class App extends Component {
     } else {
       store.set(clientStorageKey, userData);
     }
-    console.log(this.state.userData);
   };
 
   componentDidMount = () => {
@@ -348,6 +384,7 @@ class App extends Component {
               dltUserMemo={this.dltUserMemo}
               getLoggedInUserData={this.getLoggedInUserData}
               decryptToOrgObj={this.decryptToOrgObj}
+              updateUserMemo={this.updateUserMemo}
             />
           </Route>
           <Route path="/edit-memo/:id">

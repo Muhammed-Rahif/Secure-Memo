@@ -195,15 +195,43 @@ module.exports = {
     });
   },
   deleteUserMemo: (memoData) => {
-    console.log(memoData);
     return new Promise((resolve, reject) => {
-      var memoArray = "userMemos." + "allMemos";
+      var memoArray = "userMemos." + memoData.memoType;
       db.get()
         .collection(collections.MEMOS_COLLECTION)
         .updateOne(
           { userId: memoData.userId },
           {
             $pull: { [memoArray]: { memoId: memoData.memoId } },
+          }
+        )
+        .then(() => {
+          resolve({ status: true });
+        });
+    });
+  },
+  updateUserMemo: (memoData) => {
+    console.log(memoData);
+    return new Promise(async(resolve, reject) => {
+      var memoId = memoData.memoId;
+      delete memoData.memoId;
+      var memoArray = "userMemos." + await decryptToOrgStr(memoData.memoType);
+      console.log(memoArray);
+      db.get()
+        .collection(collections.MEMOS_COLLECTION)
+        .updateOne(
+          { userId: memoData.userId },
+          {
+            $set: {
+              [memoArray]: {
+                memoId: memoId,
+                memoType: memoData.memoType,
+                memoBody: memoData.memoBody,
+                memoDate: new Date(),
+                memoTitle: memoData.memoTitle,
+                modified: memoData.modified,
+              },
+            },
           }
         )
         .then(() => {
