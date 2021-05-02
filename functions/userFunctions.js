@@ -212,28 +212,34 @@ module.exports = {
   },
   updateUserMemo: (memoData) => {
     console.log(memoData);
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       var memoId = memoData.memoId;
       delete memoData.memoId;
-      var memoArray = "userMemos." + await decryptToOrgStr(memoData.memoType);
-      console.log(memoArray);
+      delete memoData.userEmail;
+      memoData.memoDate = new Date();
+      var memoTypeOnArr = (await decryptToOrgStr(memoData.memoType));
+      let modified = `userMemos.${memoTypeOnArr}.$[elem].modified`;
+      let memoType = `userMemos.${memoTypeOnArr}.$[elem].memoType`;
+      let memoTitle = `userMemos.${memoTypeOnArr}.$[elem].memoTitle`;
+      let memoDate = `userMemos.${memoTypeOnArr}.$[elem].memoDate`;
+      let memoBody = `userMemos.${memoTypeOnArr}.$[elem].memoBody`;
+      let memoid = `userMemos.${memoTypeOnArr}.$[elem].memoId`;
       db.get()
         .collection(collections.MEMOS_COLLECTION)
         .updateOne(
-          { userId: memoData.userId },
+          {userId : memoData.userId },
+          { $set: {
+             [modified] : memoData.modified, 
+             [memoType] : memoData.memoType, 
+             [memoTitle] : memoData.memoTitle, 
+             [memoDate] : memoData.memoDate, 
+             [memoBody] : memoData.memoBody, 
+             [memoid] : memoId, 
+            } },
           {
-            $set: {
-              [memoArray]: {
-                memoId: memoId,
-                memoType: memoData.memoType,
-                memoBody: memoData.memoBody,
-                memoDate: new Date(),
-                memoTitle: memoData.memoTitle,
-                modified: memoData.modified,
-              },
-            },
+            arrayFilters: [ { "elem.memoId": memoId } ]
           }
-        )
+       )
         .then(() => {
           resolve({ status: true });
         });

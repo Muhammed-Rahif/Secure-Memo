@@ -115,6 +115,8 @@ export default function BottomAppBar(props) {
       },
       method: "post",
       success: (allMemos) => {
+        alert(allMemos);
+        console.log(allMemos);
         setMemos(allMemos);
       },
     });
