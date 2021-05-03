@@ -115,6 +115,7 @@ export default function BottomAppBar(props) {
       },
       method: "post",
       success: (allMemos) => {
+        allMemos.reverse();
         setMemos(allMemos);
       },
     });
