@@ -26,6 +26,7 @@ import PublishIcon from "@material-ui/icons/Publish";
 import Paper from "@material-ui/core/Paper";
 import ReactMarkdown from "react-markdown";
 import Switch from "@material-ui/core/Switch";
+import { Badge } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -237,7 +238,7 @@ export default function FullScreenDialog(props) {
                   color="primary"
                   style={{ paddingBottom: 0 }}
                   checked={mdScrollable}
-                  onClick={ switchHandler }
+                  onClick={switchHandler}
                 />
               </p>
             </ListItem>
@@ -279,11 +280,23 @@ export default function FullScreenDialog(props) {
                   <MenuItem value="allMemos">
                     <AllInboxIcon /> All Memos
                   </MenuItem>
-                  <MenuItem value="hiddenMemos">
-                    <VisibilityOffIcon /> Hidden
+                  <MenuItem disabled="true" value="hiddenMemos">
+                    <Badge
+                      badgeContent={"Coming soon"}
+                      color="primary"
+                      variant="standard"
+                    >
+                      <VisibilityOffIcon /> Hidden
+                    </Badge>
                   </MenuItem>
-                  <MenuItem value="secureMemos">
-                    <LockIcon /> Secure
+                  <MenuItem disabled="true" value="secureMemos">
+                    <Badge
+                      badgeContent={"Coming soon"}
+                      color="primary"
+                      variant="standard"
+                    >
+                      <LockIcon /> Secure
+                    </Badge>
                   </MenuItem>
                 </Select>
               </FormControl>

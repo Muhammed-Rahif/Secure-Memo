@@ -72,7 +72,7 @@ app.post("/get-user-memos", (req, res) => {
   });
 });
 
-app.post("/get-memo-data", (req, res) => {
+app.post("/get-user-memo", (req, res) => {
   userFunctions.getUserMemo(req.body).then((memoData) => {
     res.json(memoData);
   });

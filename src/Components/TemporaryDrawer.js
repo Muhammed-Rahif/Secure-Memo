@@ -17,6 +17,7 @@ import Avatar from "@material-ui/core/Avatar";
 import { deepOrange, deepPurple } from "@material-ui/core/colors";
 import InfoIcon from "@material-ui/icons/Info";
 import { useHistory } from "react-router-dom";
+import Badge from "@material-ui/core/Badge";
 
 const useStyles = makeStyles({
   list: {
@@ -114,23 +115,35 @@ export default function TemporaryDrawer(props) {
       </List>
       <Divider />
       <List>
-        <ListItem button key="All Memos">
+        <ListItem onClick={()=>{ history.push("/all-memos") }} button key="All Memos">
           <ListItemIcon>
             <AllInboxIcon />
           </ListItemIcon>
           <ListItemText primary="All Memos" />
         </ListItem>
-        <ListItem button key="Hidden Memos">
+        <ListItem disabled="true" button key="Hidden Memos">
           <ListItemIcon>
             <VisibilityOffIcon />
           </ListItemIcon>
-          <ListItemText primary="Hidden Memos" />
+          <Badge
+            badgeContent={"Coming soon"}
+            color="primary"
+            variant="standard"
+          >
+            <ListItemText primary="Hidden Memos" />
+          </Badge>
         </ListItem>
-        <ListItem button key="Secure Memos">
+        <ListItem disabled="true" button key="Secure Memos">
           <ListItemIcon>
             <LockIcon />
           </ListItemIcon>
-          <ListItemText primary="Secure Memos" />
+          <Badge
+            badgeContent={"Coming soon"}
+            color="primary"
+            variant="standard"
+          >
+            <ListItemText primary="Secure Memos" />
+          </Badge>
         </ListItem>
         <Divider />
         <ListItem

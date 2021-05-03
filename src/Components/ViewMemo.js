@@ -124,7 +124,7 @@ export default function BottomAppBar(props) {
       window.location.href.lastIndexOf("/") + 1
     );
     $.ajax({
-      url: "/get-memo-data",
+      url: "/get-user-memo",
       data: {
         userId: props.getLoggedInUserData().userId,
         memoId: memoId,
@@ -230,7 +230,7 @@ export default function BottomAppBar(props) {
             <MenuItem
               onClick={() => {
                 handleMenuClose();
-                setOpenAlert(true);
+                handleAlertOpen();
               }}
             >
               <DeleteIcon fontSize="small" />

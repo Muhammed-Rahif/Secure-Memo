@@ -19,6 +19,7 @@ import MuiAlert from "@material-ui/lab/Alert";
 import { Redirect } from "react-router";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import NotFound from "./Components/NotFound";
 const clientStorageKey = "SecureMemoStorage";
 const encKey = "secure memo key";
 
@@ -285,10 +286,6 @@ class App extends Component {
     });
   };
 
-  editUserMemo = (userId, memoId) => {
-    alert("editUserMemo");
-  };
-
   SnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -341,12 +338,7 @@ class App extends Component {
         <Switch>
           <Route exact path="/" component={SignIn}>
             {this.state.userLoggedIn ? (
-              <HomeViewMemos
-                decryptToOrgObj={this.decryptToOrgObj}
-                getLoggedInUserData={this.getLoggedInUserData}
-                createUserMemo={this.createUserMemo}
-                logoutUser={this.logoutUser}
-              />
+              <Redirect push to="./all-memos" />
             ) : (
               <Redirect push to="./signup" />
             )}
@@ -365,31 +357,45 @@ class App extends Component {
               <SignUp signUpUser={this.signUpUser} />
             )}
           </Route>
-          <Route path="/my-memos">
-            <HomeViewMemos
-              decryptToOrgObj={this.decryptToOrgObj}
-              getLoggedInUserData={this.getLoggedInUserData}
-              createUserMemo={this.createUserMemo}
-              logoutUser={this.logoutUser}
-            />
+          <Route path="/all-memos">
+            {this.state.userLoggedIn ? (
+              <HomeViewMemos
+                decryptToOrgObj={this.decryptToOrgObj}
+                getLoggedInUserData={this.getLoggedInUserData}
+                createUserMemo={this.createUserMemo}
+                logoutUser={this.logoutUser}
+              />
+            ) : (
+              <SignIn signInUser={this.signInUser} />
+            )}
           </Route>
           <Route path="/my-profile">
-            <MyProfile />
+            {this.state.userLoggedIn ? (
+              <MyProfile />
+            ) : (
+              <SignIn signInUser={this.signInUser} />
+            )}
+          </Route>
+          <Route path="/view-memo/:id">
+            {this.state.userLoggedIn ? (
+              <ViewMemo
+                dltUserMemo={this.dltUserMemo}
+                getLoggedInUserData={this.getLoggedInUserData}
+                decryptToOrgObj={this.decryptToOrgObj}
+                updateUserMemo={this.updateUserMemo}
+              />
+            ) : (
+              <SignIn signInUser={this.signInUser} />
+            )}
           </Route>
           <Route path="/about-us">
             <AboutUs />
           </Route>
-          <Route path="/view-memo/:id">
-            <ViewMemo
-              dltUserMemo={this.dltUserMemo}
-              getLoggedInUserData={this.getLoggedInUserData}
-              decryptToOrgObj={this.decryptToOrgObj}
-              updateUserMemo={this.updateUserMemo}
-            />
-          </Route>
-          <Route path="/edit-memo/:id">
-            <EditMemo />
-          </Route>
+          {/* 404 page */}
+          <Route path="/404" component={NotFound} />
+          <Route path="/" component={NotFound} />
+          <Route path="/*" component={NotFound} />
+          <Route component={NotFound} />
         </Switch>
       </Router>
     );
