@@ -120,6 +120,7 @@ export default function BottomAppBar(props) {
     });
   });
 
+  var dateText = null;
   return (
     <React.Fragment>
       <CssBaseline />
@@ -128,37 +129,79 @@ export default function BottomAppBar(props) {
           All Memos
         </Typography>
         <List className={classes.list}>
-          <ListSubheader className={classes.subheader}>Today</ListSubheader>
+          {/* <ListSubheader className={classes.subheader}>Today</ListSubheader> */}
           {memos.map((itm) => {
             let memoId = itm.memoId;
             let memoDate = itm.memoDate;
+            memoDate = new Date(memoDate);
+            Date.prototype.addDays = function (days) {
+              var date = new Date(this.valueOf());
+              date.setDate(date.getDate() + days);
+              return date;
+            };
+            let nowDate = new Date();
+            let yestDate = new Date();
+            yestDate = yestDate.addDays(-1);
             delete itm.memoId;
             delete itm.memoDate;
             itm = props.decryptToOrgObj(itm);
             itm.memoBody = itm.memoBody.substring(0, 45);
+            var getDateComponent = () => {
+              var dateOptions = {
+                year: "numeric",
+                weekday: "long",
+                month: "long",
+                day: "numeric",
+              };
+              let tempDate;
+              if (
+                memoDate.toLocaleDateString("en-US", dateOptions) ===
+                nowDate.toLocaleDateString("en-US", dateOptions)
+              ) {
+                tempDate = "Today";
+              } else if (
+                memoDate.toLocaleDateString("en-US", dateOptions) ===
+                yestDate.toLocaleDateString("en-US", dateOptions)
+              ) {
+                tempDate = "Yesterday";
+              } else {
+                tempDate = memoDate.toLocaleDateString("en-US", dateOptions);
+              }
+              if (dateText !== tempDate) {
+                dateText = tempDate;
+                return (
+                  <ListSubheader className={classes.subheader}>
+                    {tempDate}
+                  </ListSubheader>
+                );
+              }
+            };
             return (
-              <ListItem
-                onClick={() => {
-                  window.location.href = `./view-memo/${memoId}`;
-                }}
-                button
-              >
-                <ListItemAvatar>
-                  <Avatar alt="Profile Picture">
-                    {itm.memoTitle.charAt(0).toUpperCase()}
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  style={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    maxWidth: "65vw",
+              <React.Fragment>
+                {getDateComponent()}
+                <ListItem
+                  onClick={() => {
+                    window.location.href = `./view-memo/${memoId}`;
                   }}
-                  primary={itm.memoTitle}
-                  secondary={itm.memoBody}
-                />
-              </ListItem>
+                  button
+                >
+                  <ListItemAvatar>
+                    <Avatar alt="Profile Picture">
+                      {itm.memoTitle.charAt(0).toUpperCase()}
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText
+                    style={{
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      maxWidth: "65vw",
+                    }}
+                    primary={itm.memoTitle}
+                    secondary={itm.memoBody}
+                  />
+                </ListItem>
+              </React.Fragment>
             );
           })}
         </List>
