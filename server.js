@@ -92,6 +92,13 @@ app.post("/update-user-memo", (req, res) => {
   });
 });
 
+app.post("/get-user-data", (req, res) => {
+  let userData = req.body;
+  userFunctions.getUserData(userData.userId).then((response) => {
+    res.json(response);
+  });
+});
+
 // Redirect to react app
 
 app.get("/", (req, res) => {

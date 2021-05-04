@@ -18,6 +18,9 @@ import { deepOrange, deepPurple } from "@material-ui/core/colors";
 import InfoIcon from "@material-ui/icons/Info";
 import { useHistory } from "react-router-dom";
 import Badge from "@material-ui/core/Badge";
+const clientStorageKey = "SecureMemoStorage";
+import $ from "jquery";
+var store = require("store");
 
 const useStyles = makeStyles({
   list: {
@@ -34,17 +37,15 @@ const useStyles = makeStyles({
     justifyContent: "center",
     padding: "0 !important",
   },
-  bgImage: {
-    backgroundImage: "url('../profile-bg.jpg')",
-    filter: "opacity(75%)",
+  bg: {
+    background: "#3f51b5",
     height: "100%",
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
     display: "flex",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat",
-    backgroundSize: "cover",
+    flexDirection: "column",
+    color: "white",
   },
 });
 
@@ -74,6 +75,7 @@ const profileIconStyles = makeStyles((theme) => ({
 
 export default function TemporaryDrawer(props) {
   const anchor = props.anchor;
+  const [userData, setUserData] = React.useState();
   const classes = useStyles();
   const profileIconClasses = profileIconStyles();
   const [state, setState] = React.useState({
@@ -95,6 +97,23 @@ export default function TemporaryDrawer(props) {
     setState({ ...state, [anchor]: open });
   };
 
+  const getUserData = () => {
+    $.ajax({
+      url: "/get-user-data",
+      method: "post",
+      data: {
+        userId: store.get(clientStorageKey).userId,
+      },
+      success: (userData) => {
+        setUserData(userData);
+      },
+    });
+  };
+
+  React.useEffect(() => {
+    setUserData(getUserData());
+  }, []);
+
   const list = (anchor) => (
     <div
       className={clsx(classes.list, {
@@ -105,17 +124,29 @@ export default function TemporaryDrawer(props) {
       onKeyDown={toggleDrawer(anchor, false)}
     >
       <List className={classes.profileSection}>
-        <div className={classes.bgImage}>
+        <div className={classes.bg}>
           <Avatar
             className={[profileIconClasses.orange, profileIconClasses.large]}
           >
-            OP
+            {userData
+              ? userData.firstName.charAt(0).toUpperCase() +
+                userData.lastName.charAt(0)
+              : null}
           </Avatar>
+          <p>
+            {userData ? userData.firstName + " " + userData.lastName : null}
+          </p>
         </div>
       </List>
       <Divider />
       <List>
-        <ListItem onClick={()=>{ history.push("/all-memos") }} button key="All Memos">
+        <ListItem
+          onClick={() => {
+            history.push("/all-memos");
+          }}
+          button
+          key="All Memos"
+        >
           <ListItemIcon>
             <AllInboxIcon />
           </ListItemIcon>

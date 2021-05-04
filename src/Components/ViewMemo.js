@@ -34,6 +34,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import $ from "jquery";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   text: {
@@ -79,6 +80,7 @@ export default function BottomAppBar(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [memoData, setMemoData] = React.useState("");
   const [openAlert, setOpenAlert] = React.useState(false);
+  var history = useHistory();
 
   const handleAlertOpen = () => {
     setOpenAlert(true);
@@ -236,7 +238,12 @@ export default function BottomAppBar(props) {
               <DeleteIcon fontSize="small" />
               Delete
             </MenuItem>
-            <MenuItem onClick={handleMenuClose}>
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                history.push("/");
+              }}
+            >
               <HomeIcon fontSize="small" />
               Home
             </MenuItem>

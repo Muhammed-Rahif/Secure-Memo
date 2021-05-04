@@ -371,7 +371,7 @@ class App extends Component {
           </Route>
           <Route path="/my-profile">
             {this.state.userLoggedIn ? (
-              <MyProfile />
+              <MyProfile logoutUser={this.logoutUser} />
             ) : (
               <SignIn signInUser={this.signInUser} />
             )}

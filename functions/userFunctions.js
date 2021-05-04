@@ -7,6 +7,12 @@ const { v4: uuidv4 } = require("uuid");
 const { ObjectId } = require("bson");
 const { response } = require("express");
 
+var decUnSaltStr = (str) => {
+  return CryptoJS.AES.decrypt(str, encKey, {
+    iv: { words: [0, 0, 0, 0], sigBytes: 16 },
+  }).toString();
+};
+
 var decryptToOrgStr = (str) => {
   return new Promise((resolve, reject) => {
     let decStr = "";
@@ -109,7 +115,15 @@ module.exports = {
       db.get()
         .collection(collections.USERS_COLLECTION)
         .findOne({ userId: userId })
-        .then((userData) => {
+        .then(async (userData) => {
+          let userEmail = userData.userEmail;
+          let userPassword = userData.password;
+          let userId = userData.userId;
+          delete userData.userId;
+          delete userData.password;
+          delete userData.email;
+          delete userData._id;
+          userData = await decryptToOrgObj(userData);
           resolve(userData);
         });
     });
@@ -217,7 +231,7 @@ module.exports = {
       delete memoData.memoId;
       delete memoData.userEmail;
       memoData.memoDate = new Date();
-      var memoTypeOnArr = (await decryptToOrgStr(memoData.memoType));
+      var memoTypeOnArr = await decryptToOrgStr(memoData.memoType);
       let modified = `userMemos.${memoTypeOnArr}.$[elem].modified`;
       let memoType = `userMemos.${memoTypeOnArr}.$[elem].memoType`;
       let memoTitle = `userMemos.${memoTypeOnArr}.$[elem].memoTitle`;
@@ -227,19 +241,21 @@ module.exports = {
       db.get()
         .collection(collections.MEMOS_COLLECTION)
         .updateOne(
-          {userId : memoData.userId },
-          { $set: {
-             [modified] : memoData.modified, 
-             [memoType] : memoData.memoType, 
-             [memoTitle] : memoData.memoTitle, 
-             [memoDate] : memoData.memoDate, 
-             [memoBody] : memoData.memoBody, 
-             [memoid] : memoId, 
-            } },
+          { userId: memoData.userId },
           {
-            arrayFilters: [ { "elem.memoId": memoId } ]
+            $set: {
+              [modified]: memoData.modified,
+              [memoType]: memoData.memoType,
+              [memoTitle]: memoData.memoTitle,
+              [memoDate]: memoData.memoDate,
+              [memoBody]: memoData.memoBody,
+              [memoid]: memoId,
+            },
+          },
+          {
+            arrayFilters: [{ "elem.memoId": memoId }],
           }
-       )
+        )
         .then(() => {
           resolve({ status: true });
         });

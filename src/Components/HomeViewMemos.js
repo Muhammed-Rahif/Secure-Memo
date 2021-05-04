@@ -25,6 +25,7 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 const clientStorageKey = "SecureMemoStorage";
 import $ from "jquery";
+import { useHistory } from "react-router";
 
 // {messages.map(({ id, primary, secondary, person }) => (
 //   <React.Fragment key={id}>
@@ -96,6 +97,7 @@ export default function BottomAppBar(props) {
   const [createMemo, setCreateMemo] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [memos, setMemos] = useState(new Array());
+  var history = useHistory();
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -130,7 +132,6 @@ export default function BottomAppBar(props) {
           All Memos
         </Typography>
         <List className={classes.list}>
-          {/* <ListSubheader className={classes.subheader}>Today</ListSubheader> */}
           {memos.map((itm) => {
             let memoId = itm.memoId;
             let memoDate = itm.memoDate;
@@ -261,8 +262,22 @@ export default function BottomAppBar(props) {
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
           >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                history.push("/my-profile")
+              }}
+            >
+              My Profile
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                history.push("/my-account")
+              }}
+            >
+              My account
+            </MenuItem>
             <MenuItem
               onClick={() => {
                 handleMenuClose();
