@@ -44,7 +44,7 @@ class App extends Component {
     };
   }
 
-  BackdropClose = () => {
+  backdropClose = () => {
     this.setState({ backdropOpen: false });
   };
   backdropToggle = () => {
@@ -366,14 +366,14 @@ class App extends Component {
                 logoutUser={this.logoutUser}
               />
             ) : (
-              <SignIn signInUser={this.signInUser} />
+              <Redirect push to="./signup" />
             )}
           </Route>
           <Route path="/my-profile">
             {this.state.userLoggedIn ? (
               <MyProfile logoutUser={this.logoutUser} />
             ) : (
-              <SignIn signInUser={this.signInUser} />
+              <Redirect push to="./signup" />
             )}
           </Route>
           <Route path="/view-memo/:id">
@@ -385,7 +385,7 @@ class App extends Component {
                 updateUserMemo={this.updateUserMemo}
               />
             ) : (
-              <SignIn signInUser={this.signInUser} />
+              <Redirect push to="./signup" />
             )}
           </Route>
           <Route path="/about-us">
