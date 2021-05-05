@@ -338,14 +338,14 @@ class App extends Component {
         <Switch>
           <Route exact path="/" component={SignIn}>
             {this.state.userLoggedIn ? (
-              <Redirect push to="./all-memos" />
+              <Redirect push to="/all-memos" />
             ) : (
-              <Redirect push to="./signup" />
+              <Redirect push to="/signup" />
             )}
           </Route>
           <Route path="/signin">
             {this.state.userLoggedIn ? (
-              <Redirect push to="./" />
+              <Redirect push to="/" />
             ) : (
               <SignIn signInUser={this.signInUser} />
             )}
@@ -366,14 +366,14 @@ class App extends Component {
                 logoutUser={this.logoutUser}
               />
             ) : (
-              <Redirect push to="./signup" />
+              <Redirect push to="/signup" />
             )}
           </Route>
           <Route path="/my-profile">
             {this.state.userLoggedIn ? (
               <MyProfile logoutUser={this.logoutUser} />
             ) : (
-              <Redirect push to="./signup" />
+              <Redirect push to="/signup" />
             )}
           </Route>
           <Route path="/view-memo/:id">
@@ -385,7 +385,7 @@ class App extends Component {
                 updateUserMemo={this.updateUserMemo}
               />
             ) : (
-              <Redirect push to="./signup" />
+              <Redirect push to="/signup" />
             )}
           </Route>
           <Route path="/about-us">
