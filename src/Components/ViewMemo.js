@@ -143,8 +143,6 @@ export default function BottomAppBar(props) {
           memoData.memoId = memoId;
           memoData.memoDate = memoDate;
           setMemoData(memoData);
-        } else {
-          window.location.href = "/";
         }
       },
     });

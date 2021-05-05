@@ -83,9 +83,9 @@ workbox.routing.registerRoute(
 workbox.routing.registerRoute(
   new RegExp("/"),
   new workbox.strategies.StaleWhileRevalidate({
-    cacheName: "cache-news-datas",
+    cacheName: clientStorageKey+"Reqs",
     cacheExpiration: {
-      maxAgeSeconds: 60 * 30, //cache the news content for 30mn
+      maxAgeSeconds: 10, //cache the news content for 10s
     },
   })
 );

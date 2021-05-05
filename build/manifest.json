@@ -1,8 +1,8 @@
 {
-    "theme_color": "#000000",
-    "background_color": "#000000",
-    "display": "fullscreen",
-    "start_url": "",
+    "theme_color": "#fff",
+    "background_color": "#fff",
+    "display": "standalone",
+    "start_url": "/",
     "name": "Secure Memo",
     "short_name": "Secure Memo",
     "description": "This is secured memo app by Rahif",

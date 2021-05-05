@@ -1,6 +1,6 @@
 {
   "name": "secure-memo",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "private": true,
   "main": "server.js",
   "proxy": "http://localhost:7000",
