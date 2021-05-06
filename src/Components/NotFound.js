@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     background: "whitesmoke",
     flexDirection: "column",
-    marginTop: "5rem",
+    minHeight: "100vh",
   },
 }));
 
@@ -23,10 +23,10 @@ function NotFound(props) {
       <Typography variant="h1" component="h2" gutterBottom>
         404
       </Typography>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h5" gutterBottom>
         <b>Ooops..!</b>
       </Typography>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="p" gutterBottom>
         THAT PAGE DOESN'T EXIST OR IS UNAVAILABLE.
       </Typography>
       <div
