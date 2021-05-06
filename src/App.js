@@ -31,7 +31,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userData: false,
+      userData: {},
       userLoggedIn: false,
       myMemos: [],
       snackbar: {
@@ -295,23 +295,27 @@ class App extends Component {
   };
 
   verifyUserLogin = () => {
-    let userData = this.state.userData;
     let userLocalStorage = store.get(clientStorageKey);
     if (userLocalStorage) {
+      console.log("here");
       this.setState({
-        userData: userLocalStorage,
+        userData: store.get(clientStorageKey),
         userLoggedIn: true,
       });
     } else {
-      store.set(clientStorageKey, userData);
+      store.set(clientStorageKey, this.state.userData);
     }
   };
-
-  componentDidMount = () => {
+  
+  componentWillMount = () => {
     this.verifyUserLogin();
   };
 
   render() {
+    console.log(store.get(clientStorageKey).userId);
+    console.log(this.state.userLoggedIn);
+    console.log(this.state.userData);
+    console.log(store.get(clientStorageKey));
     return (
       <Router>
         {/* Backdrop */}
@@ -352,7 +356,7 @@ class App extends Component {
           </Route>
           <Route path="/signup">
             {this.state.userLoggedIn ? (
-              <Redirect push to="./" />
+              <Redirect push to="/" />
             ) : (
               <SignUp signUpUser={this.signUpUser} />
             )}
@@ -385,7 +389,7 @@ class App extends Component {
                 updateUserMemo={this.updateUserMemo}
               />
             ) : (
-              <Redirect push to="/signup" />
+              <Redirect push to="/" />
             )}
           </Route>
           <Route path="/about-us">
