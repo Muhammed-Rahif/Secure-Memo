@@ -2,7 +2,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
+  <a href="https://secure-memo.herokuapp.com/" target="_blank">
     <img src="public/favicon.jpg" alt="Logo" width="80" height="80">
   </a>
 

@@ -31,7 +31,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userData: {},
+      userData: undefined,
       userLoggedIn: false,
       myMemos: [],
       snackbar: {
@@ -89,6 +89,7 @@ class App extends Component {
       success: (response) => {
         if (response.status) {
           this.backdropToggle();
+          store.set(clientStorageKey, response.userData);
           this.setState({ userData: response.userData });
           this.setState({ userLoggedIn: true });
           this.verifyUserLogin();
@@ -124,6 +125,7 @@ class App extends Component {
       success: (response) => {
         if (response.status) {
           this.backdropToggle();
+          store.set(clientStorageKey, response.userData);
           this.setState({ userData: response.userData });
           this.setState({ userLoggedIn: true });
           this.verifyUserLogin();
@@ -147,7 +149,7 @@ class App extends Component {
   };
 
   logoutUser = () => {
-    this.setState({ userLoggedIn: false, userData: null });
+    this.setState({ userLoggedIn: false, userData: undefined });
     store.remove(clientStorageKey);
     window.location.reload();
   };
@@ -295,8 +297,7 @@ class App extends Component {
   };
 
   verifyUserLogin = () => {
-    let userLocalStorage = store.get(clientStorageKey);
-    if (typeof userLocalStorage.userId !== "undefined") {
+    if (store.get(clientStorageKey)) {
       console.log("here");
       this.setState({
         userData: store.get(clientStorageKey),
@@ -306,13 +307,13 @@ class App extends Component {
       store.set(clientStorageKey, this.state.userData);
     }
   };
-  
+
   componentWillMount = () => {
+    console.log(store.get(clientStorageKey));
     this.verifyUserLogin();
   };
 
   render() {
-    console.log(store.get(clientStorageKey).userId);
     console.log(this.state.userLoggedIn);
     console.log(this.state.userData);
     console.log(store.get(clientStorageKey));
