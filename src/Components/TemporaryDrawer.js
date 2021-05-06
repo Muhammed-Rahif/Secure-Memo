@@ -19,6 +19,7 @@ import InfoIcon from "@material-ui/icons/Info";
 import { useHistory } from "react-router-dom";
 import Badge from "@material-ui/core/Badge";
 const clientStorageKey = "SecureMemoStorage";
+import PersonIcon from '@material-ui/icons/Person';
 import $ from "jquery";
 var store = require("store");
 
@@ -151,6 +152,18 @@ export default function TemporaryDrawer(props) {
             <AllInboxIcon />
           </ListItemIcon>
           <ListItemText primary="All Memos" />
+        </ListItem>
+        <ListItem
+          onClick={() => {
+            history.push("/my-profile");
+          }}
+          button
+          key="My Profile"
+        >
+          <ListItemIcon>
+            <PersonIcon />
+          </ListItemIcon>
+          <ListItemText primary="My Profile" />
         </ListItem>
         <ListItem disabled="true" button key="Hidden Memos">
           <ListItemIcon>
