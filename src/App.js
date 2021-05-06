@@ -296,7 +296,7 @@ class App extends Component {
 
   verifyUserLogin = () => {
     let userLocalStorage = store.get(clientStorageKey);
-    if (userLocalStorage.userId) {
+    if (typeof userLocalStorage.userId !== "undefined") {
       console.log("here");
       this.setState({
         userData: store.get(clientStorageKey),
