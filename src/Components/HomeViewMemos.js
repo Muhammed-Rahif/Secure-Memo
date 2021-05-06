@@ -25,6 +25,7 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 const clientStorageKey = "SecureMemoStorage";
 import $ from "jquery";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import { useHistory } from "react-router";
 
 // {messages.map(({ id, primary, secondary, person }) => (
@@ -97,6 +98,7 @@ export default function BottomAppBar(props) {
   const [createMemo, setCreateMemo] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [memos, setMemos] = useState(new Array());
+  const [loadingMemos, setLoadingMemos] = useState(true);
   var history = useHistory();
 
   const handleMenuClick = (event) => {
@@ -119,6 +121,7 @@ export default function BottomAppBar(props) {
       success: (allMemos) => {
         allMemos.reverse();
         setMemos(allMemos);
+        setLoadingMemos(false);
       },
     });
   });
@@ -131,6 +134,18 @@ export default function BottomAppBar(props) {
         <Typography className={classes.text} variant="h5" gutterBottom>
           All Memos
         </Typography>
+        {loadingMemos ? (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "2.5rem",
+            }}
+          >
+            <CircularProgress />
+          </div>
+        ) : null}
         <List className={classes.list}>
           {memos.map((itm) => {
             let memoId = itm.memoId;
@@ -265,7 +280,7 @@ export default function BottomAppBar(props) {
             <MenuItem
               onClick={() => {
                 handleMenuClose();
-                history.push("/my-profile")
+                history.push("/my-profile");
               }}
             >
               My Profile
@@ -273,7 +288,7 @@ export default function BottomAppBar(props) {
             <MenuItem
               onClick={() => {
                 handleMenuClose();
-                history.push("/my-account")
+                history.push("/my-account");
               }}
             >
               My account

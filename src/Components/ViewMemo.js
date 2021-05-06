@@ -35,6 +35,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import $ from "jquery";
 import { useHistory } from "react-router-dom";
+import { CircularProgress } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   text: {
@@ -80,6 +81,7 @@ export default function BottomAppBar(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [memoData, setMemoData] = React.useState("");
   const [openAlert, setOpenAlert] = React.useState(false);
+  const [loadingMemo, setLoadingMemo] = React.useState(true);
   var history = useHistory();
 
   const handleAlertOpen = () => {
@@ -143,6 +145,7 @@ export default function BottomAppBar(props) {
           memoData.memoId = memoId;
           memoData.memoDate = memoDate;
           setMemoData(memoData);
+          setLoadingMemo(false);
         }
       },
     });
@@ -152,6 +155,18 @@ export default function BottomAppBar(props) {
     <React.Fragment>
       <CssBaseline />
       <Paper square className={classes.paper}>
+        {loadingMemo ? (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "2.5rem",
+            }}
+          >
+            <CircularProgress />
+          </div>
+        ) : null}
         <Typography className={classes.text} variant="h5" gutterBottom>
           {memoData.memoTitle}
         </Typography>
