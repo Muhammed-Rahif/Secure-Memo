@@ -270,7 +270,7 @@ class App extends Component {
               },
             },
           });
-          window.location.href = "/";
+          <Redirect push to="/" />;
         } else {
           this.setState({
             snackbar: {
