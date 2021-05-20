@@ -11,7 +11,7 @@
   <p align="center">
     An awesome encrypted memo app for saving your notes!
     <br />
-    <a href="https://secure-memo.herokuapp.com/"><strong>Open Test website »</strong></a>
+    <a href="https://secure-memo.herokuapp.com/"><strong>Open website »</strong></a>
     <br />
     <br />
     <a href="https://github.com/Muhammed-Rahif/Secure-Memo/">Github Link</a>
