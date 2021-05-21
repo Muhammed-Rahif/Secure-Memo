@@ -1,11 +1,9 @@
-const db = require("../config/mongodb-connnection");
+const db = require("../config/mongodb-connection");
 const collections = require("../config/mongodb-collections");
 const CryptoJS = require("crypto-js");
 const bcrypt = require("bcryptjs");
 const encKey = "secure memo key";
 const { v4: uuidv4 } = require("uuid");
-const { ObjectId } = require("bson");
-const { response } = require("express");
 
 var decUnSaltStr = (str) => {
   return CryptoJS.AES.decrypt(str, encKey, {
@@ -182,7 +180,15 @@ module.exports = {
         .collection(collections.MEMOS_COLLECTION)
         .findOne({ userId: userId })
         .then((userMemoData) => {
-          resolve(userMemoData.userMemos[memoType]);
+          console.log(userMemoData);
+          if (userMemoData == null) {
+            resolve([]);
+          } else {
+            const sortedArray = userMemoData.userMemos[memoType].sort(
+              (a, b) => a.memoDate - b.memoDate
+            );
+            resolve(sortedArray);
+          }
         });
     });
   },

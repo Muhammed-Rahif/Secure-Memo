@@ -215,7 +215,7 @@ export default function BottomAppBar(props) {
               aria-controls="simple-menu"
               edge="end"
               color="inherit"
-              aria-aria-haspopup="true"
+              aria-haspopup="true"
               onClick={handleMenuClick}
             >
               <MoreIcon />
@@ -306,6 +306,7 @@ export default function BottomAppBar(props) {
                   memoId: memoData.memoId,
                   memoType: memoData.memoType,
                 });
+                window.location.href = "/";
               }}
               color="secondary"
               autoFocus

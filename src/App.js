@@ -84,7 +84,7 @@ class App extends Component {
     userData.email = this.encUnSaltStr(userEmail);
     $.ajax({
       method: "post",
-      url: "./signup-user",
+      url: "/signup-user",
       data: userData,
       success: (response) => {
         if (response.status) {
@@ -120,7 +120,7 @@ class App extends Component {
     userData.email = this.encUnSaltStr(userEmail);
     $.ajax({
       method: "post",
-      url: "./signin-user",
+      url: "/signin-user",
       data: userData,
       success: (response) => {
         if (response.status) {
@@ -166,7 +166,7 @@ class App extends Component {
     Object.assign(userData, memoData);
     $.ajax({
       method: "post",
-      url: "./create-user-memo",
+      url: "/create-user-memo",
       data: userData,
       success: (response) => {
         this.backdropToggle();
@@ -270,7 +270,7 @@ class App extends Component {
               },
             },
           });
-          <Redirect push to="/" />;
+          window.location.href = "/";
         } else {
           this.setState({
             snackbar: {
