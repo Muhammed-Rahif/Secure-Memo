@@ -18,7 +18,7 @@
     ·
     <a href="https://github.com/Muhammed-Rahif/Secure-Memo/issues/">Report Bug</a>
     ·
-    <a href="https://github.com/Muhammed-Rahif/Secure-Memo/issues/">Send a Pull Request</a>
+    <a href="https://github.com/Muhammed-Rahif/Secure-Memo/pulls/">Send a Pull Request</a>
   </p>
 </p>
 
